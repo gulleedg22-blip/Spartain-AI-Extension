@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spartain AI</title>
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="./sidepanel.css" />
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- Header: logo + title + status -->
+    <header class="header">
+      <img class="header__logo" src="../../assets/icons/icon-48.png" alt="" width="32" height="32" />
+      <div class="header__text">
+        <h1 class="header__title">Spartain AI</h1>
+        <p class="header__subtitle" id="page-title">No page context</p>
+      </div>
+      <span class="status" id="status" title="Background worker status">●</span>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab is-active" role="tab" aria-selected="true" data-tab="chat">Chat</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="tools">Tools</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="settings">Settings</button>
+    </nav>
+
+    <!-- Chat -->
+    <section class="panel is-active" id="panel-chat" role="tabpanel" data-panel="chat">
+      <div class="messages" id="messages" aria-live="polite">
+        <div class="empty" id="empty-state">
+          <img src="../../assets/logo-transparent.png" alt="" width="96" height="96" />
+          <h2>Ask Spartain</h2>
+          <p>Summarize this page, explain a selection, or ask anything. This build is the UI framework only; the local model is not connected yet.</p>
+          <div class="chips">
+            <button class="chip" data-prompt="Summarize this page">Summarize page</button>
+            <button class="chip" data-prompt="Explain the selected text">Explain selection</button>
+            <button class="chip" data-prompt="What should I know about this site?">Key facts</button>
+          </div>
+        </div>
+      </div>
+      <form class="composer" id="composer">
+        <textarea id="input" class="composer__input" rows="1" placeholder="Message Spartain…" aria-label="Message"></textarea>
+        <button type="submit" class="btn btn--primary composer__send" id="send" aria-label="Send">Send</button>
+      </form>
+      <p class="hint"><kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line.</p>
+    </section>
+
+    <!-- Tools -->
+    <section class="panel" id="panel-tools" role="tabpanel" data-panel="tools" hidden>
+      <div class="card">
+        <h3>Page context</h3>
+        <dl class="kv">
+          <dt>Title</dt><dd id="ctx-title">—</dd>
+          <dt>URL</dt><dd id="ctx-url">—</dd>
+          <dt>Selection</dt><dd id="ctx-selection">—</dd>
+        </dl>
+        <button class="btn" id="refresh-context">Refresh</button>
+      </div>
+      <div class="card">
+        <h3>Coming soon</h3>
+        <ul class="list">
+          <li>Study guide from page</li>
+          <li>Flashcards from selection</li>
+          <li>Citation helper</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="panel" id="panel-settings" role="tabpanel" data-panel="settings" hidden>
+      <form class="card" id="settings-form">
+        <h3>Preferences</h3>
+        <label class="field">
+          <span>Display name</span>
+          <input type="text" name="displayName" placeholder="Optional" />
+        </label>
+        <label class="field">
+          <span>Theme</span>
+          <select name="theme">
+            <option value="system">Match system</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
+        <label class="field field--check">
+          <input type="checkbox" name="includePageContext" />
+          <span>Include page title and selection with messages</span>
+        </label>
+        <h3>Local model</h3>
+        <label class="field">
+          <span>Endpoint</span>
+          <input type="url" name="modelEndpoint" placeholder="http://localhost:11434" />
+        </label>
+        <label class="field">
+          <span>Model name</span>
+          <input type="text" name="modelName" placeholder="e.g. llama3" />
+        </label>
+        <p class="hint">Runs on your own machine. Nothing leaves the browser until a provider is implemented in <code>src/ai/provider.js</code>.</p>
+        <div class="row">
+          <button type="submit" class="btn btn--primary">Save</button>
+          <button type="button" class="btn btn--danger" id="clear-history">Clear chat</button>
+        </div>
+        <p class="hint" id="settings-status"></p>
+      </form>
+      <p class="version">Spartain AI <span id="version"></span></p>
+    </section>
+
+  </div>
+  <script type="module" src="./sidepanel.js"></script>
+</body>
+</html>

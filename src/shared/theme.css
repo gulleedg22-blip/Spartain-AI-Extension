@@ -1,0 +1,70 @@
+/* Spartain AI design tokens.
+   Brand green is sampled from the DLSHS Spartan helmet logo (#076124).
+   Change colors HERE only; every other stylesheet uses the variables. */
+
+:root {
+  /* Brand */
+  --sp-green: #076124;
+  --sp-green-dark: #054a1b;
+  --sp-green-light: #e6f2ea;
+  --sp-green-muted: #9ec7ab;
+  --sp-white: #ffffff;
+
+  /* Neutrals */
+  --sp-gray-50: #f6f8f7;
+  --sp-gray-100: #eceff0;
+  --sp-gray-300: #c9d0cc;
+  --sp-gray-500: #6b7570;
+  --sp-gray-700: #3a423e;
+  --sp-gray-900: #161a18;
+
+  /* Semantic */
+  --sp-bg: var(--sp-white);
+  --sp-bg-elevated: var(--sp-gray-50);
+  --sp-text: var(--sp-gray-900);
+  --sp-text-muted: var(--sp-gray-500);
+  --sp-border: var(--sp-gray-300);
+  --sp-accent: var(--sp-green);
+  --sp-accent-contrast: var(--sp-white);
+  --sp-bubble-user: var(--sp-green);
+  --sp-bubble-user-text: var(--sp-white);
+  --sp-bubble-ai: var(--sp-gray-100);
+  --sp-bubble-ai-text: var(--sp-gray-900);
+  --sp-danger: #b3261e;
+  --sp-status-ok: #7ee2a0;
+  --sp-status-bad: #ff9a9a;
+
+  /* Layout */
+  --sp-radius: 10px;
+  --sp-radius-sm: 6px;
+  --sp-space-1: 4px;
+  --sp-space-2: 8px;
+  --sp-space-3: 12px;
+  --sp-space-4: 16px;
+  --sp-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --sp-font-size: 14px;
+}
+
+/* Dark mode: follow the OS unless the user picked a theme in Settings. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sp-bg: var(--sp-gray-900);
+    --sp-bg-elevated: #1f2522;
+    --sp-text: var(--sp-gray-50);
+    --sp-text-muted: #a3aca7;
+    --sp-border: #35403a;
+    --sp-bubble-ai: #262d29;
+    --sp-bubble-ai-text: var(--sp-gray-50);
+    --sp-green-light: #14301d;
+  }
+}
+:root[data-theme="dark"] {
+  --sp-bg: var(--sp-gray-900);
+  --sp-bg-elevated: #1f2522;
+  --sp-text: var(--sp-gray-50);
+  --sp-text-muted: #a3aca7;
+  --sp-border: #35403a;
+  --sp-bubble-ai: #262d29;
+  --sp-bubble-ai-text: var(--sp-gray-50);
+  --sp-green-light: #14301d;
+}
