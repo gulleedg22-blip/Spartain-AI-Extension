@@ -56,6 +56,9 @@ body {
 .msg--user { align-self: flex-end; background: var(--sp-bubble-user); color: var(--sp-bubble-user-text); border-bottom-right-radius: 3px; }
 .msg--ai { align-self: flex-start; background: var(--sp-bubble-ai); color: var(--sp-bubble-ai-text); border-bottom-left-radius: 3px; }
 .msg--ai.is-pending { opacity: .7; font-style: italic; }
+.msg--ai.is-error { color: var(--sp-danger); }
+.card h3 + .field, .card h3:not(:first-child) { margin-top: var(--sp-space-2); }
+code { font-size: 12px; background: var(--sp-bg); border: 1px solid var(--sp-border); border-radius: 4px; padding: 0 4px; }
 
 .composer { display: flex; gap: var(--sp-space-2); align-items: flex-end; }
 .composer__input {
@@ -86,7 +89,7 @@ kbd { font-family: inherit; border: 1px solid var(--sp-border); border-radius: 4
 .kv dd { margin: 0; overflow-wrap: anywhere; max-height: 80px; overflow: auto; }
 .list { margin: 0; padding-left: 18px; line-height: 1.6; }
 .field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
-.field input[type="text"], .field select {
+.field input[type="text"], .field input[type="url"], .field select {
   padding: 8px 10px; font: inherit; border: 1px solid var(--sp-border); border-radius: var(--sp-radius-sm); background: var(--sp-bg); color: var(--sp-text);
 }
 .field--check { flex-direction: row; align-items: center; gap: 8px; }

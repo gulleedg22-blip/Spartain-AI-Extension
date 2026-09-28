@@ -1,11 +1,17 @@
-// Side panel UI logic. Vanilla JS, no build step.
-// Layout only: the AI reply is a stub (see `respond()`), replace it with a
-// real backend call. Never put API keys in this extension; call your own server.
+// Side panel UI. Vanilla JS, no build step.
+// This file owns LAYOUT BEHAVIOUR ONLY: tabs, rendering messages, the
+// composer, theme, and the settings form. Everything that does real work is
+// behind three boundaries that are still open for contributors:
+//   src/ai/provider.js          -> the local model call
+//   src/sidepanel/storage.js    -> chrome.storage persistence
+//   src/sidepanel/page-context.js -> what is on the current tab
 
-import { MSG, STORAGE_KEYS, DEFAULT_SETTINGS } from '../shared/messages.js';
+import { MSG, DEFAULT_SETTINGS } from '../shared/messages.js';
+import { generate, ProviderNotConfiguredError } from '../ai/provider.js';
+import { loadSettings, saveSettings, loadHistory, saveHistory, clearHistory } from './storage.js';
+import { getPageContext } from './page-context.js';
 
 const $ = (sel) => document.querySelector(sel);
-
 const els = {
   tabs: document.querySelectorAll('.tab'),
   panels: document.querySelectorAll('.panel'),
@@ -46,18 +52,7 @@ els.tabs.forEach((tab) => {
   });
 });
 
-/* ---------- Storage ---------- */
-async function loadState() {
-  const data = await chrome.storage.local.get([STORAGE_KEYS.SETTINGS, STORAGE_KEYS.HISTORY]);
-  settings = { ...DEFAULT_SETTINGS, ...(data[STORAGE_KEYS.SETTINGS] ?? {}) };
-  history = Array.isArray(data[STORAGE_KEYS.HISTORY]) ? data[STORAGE_KEYS.HISTORY] : [];
-  applyTheme();
-  fillSettingsForm();
-  history.forEach((m) => renderMessage(m.role, m.text));
-}
-const saveSettings = () => chrome.storage.local.set({ [STORAGE_KEYS.SETTINGS]: settings });
-const saveHistory = () => chrome.storage.local.set({ [STORAGE_KEYS.HISTORY]: history.slice(-200) });
-
+/* ---------- Theme ---------- */
 function applyTheme() {
   if (settings.theme === 'system') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = settings.theme;
@@ -69,38 +64,36 @@ function fillSettingsForm() {
   f.displayName.value = settings.displayName;
   f.theme.value = settings.theme;
   f.includePageContext.checked = settings.includePageContext;
+  f.modelEndpoint.value = settings.modelEndpoint;
+  f.modelName.value = settings.modelName;
 }
 els.settingsForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = els.settingsForm.elements;
   settings = {
+    ...settings,
     displayName: f.displayName.value.trim(),
     theme: f.theme.value,
     includePageContext: f.includePageContext.checked,
+    modelEndpoint: f.modelEndpoint.value.trim(),
+    modelName: f.modelName.value.trim(),
   };
-  await saveSettings();
+  await saveSettings(settings);
   applyTheme();
-  els.settingsStatus.textContent = 'Saved.';
-  setTimeout(() => (els.settingsStatus.textContent = ''), 1500);
+  flash('Saved (in memory only until storage is implemented).');
 });
 els.clearHistory.addEventListener('click', async () => {
   history = [];
-  await saveHistory();
+  await clearHistory();
   els.messages.querySelectorAll('.msg').forEach((n) => n.remove());
   els.empty.hidden = false;
 });
-
-/* ---------- Page context ---------- */
-async function getPageContext() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id || !/^https?:/.test(tab.url ?? '')) return { title: tab?.title ?? '', url: tab?.url ?? '', selection: '' };
-  try {
-    return await chrome.tabs.sendMessage(tab.id, { type: MSG.GET_PAGE_CONTEXT });
-  } catch {
-    // Content script not injected yet (e.g. page loaded before install). Fall back to tab info.
-    return { title: tab.title ?? '', url: tab.url ?? '', selection: '' };
-  }
+function flash(text) {
+  els.settingsStatus.textContent = text;
+  setTimeout(() => (els.settingsStatus.textContent = ''), 2500);
 }
+
+/* ---------- Page context (Tools tab + header subtitle) ---------- */
 async function refreshContext() {
   const ctx = await getPageContext();
   els.pageTitle.textContent = ctx.title || ctx.url || 'No page context';
@@ -125,14 +118,6 @@ function renderMessage(role, text, pending = false) {
   return div;
 }
 
-// STUB: replace with a call to your backend. Do not call model APIs directly
-// from the extension with an embedded key.
-async function respond(userText, ctx) {
-  await new Promise((r) => setTimeout(r, 400));
-  const where = ctx?.title ? ` (about "${ctx.title}")` : '';
-  return `AI is not connected yet${where}. You said: ${userText}`;
-}
-
 async function sendMessage() {
   const text = els.input.value.trim();
   if (!text) return;
@@ -143,19 +128,21 @@ async function sendMessage() {
   renderMessage('user', text);
   history.push({ role: 'user', text, at: Date.now() });
 
-  const ctx = settings.includePageContext ? await getPageContext() : null;
+  const context = settings.includePageContext ? await getPageContext() : null;
   const pending = renderMessage('ai', 'Thinking…', true);
   try {
-    const reply = await respond(text, ctx);
+    const reply = await generate({ messages: history, context, settings, signal: undefined });
     pending.textContent = reply;
-    pending.classList.remove('is-pending');
     history.push({ role: 'ai', text: reply, at: Date.now() });
   } catch (err) {
-    pending.textContent = `Error: ${err?.message ?? err}`;
-    pending.classList.remove('is-pending');
+    pending.textContent = err instanceof ProviderNotConfiguredError
+      ? 'No model connected yet. This build is the UI framework only.'
+      : `Error: ${err?.message ?? err}`;
+    pending.classList.add('is-error');
   } finally {
+    pending.classList.remove('is-pending');
     els.send.disabled = false;
-    await saveHistory();
+    await saveHistory(history);
     els.input.focus();
   }
 }
@@ -176,7 +163,11 @@ document.querySelectorAll('.chip').forEach((chip) => {
 /* ---------- Boot ---------- */
 async function boot() {
   els.version.textContent = 'v' + chrome.runtime.getManifest().version;
-  await loadState();
+  settings = await loadSettings();
+  history = await loadHistory();
+  applyTheme();
+  fillSettingsForm();
+  history.forEach((m) => renderMessage(m.role, m.text));
   await refreshContext();
   try {
     const pong = await chrome.runtime.sendMessage({ type: MSG.PING });

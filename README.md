@@ -1,6 +1,10 @@
 # Spartain AI Extension
 
-A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Green and white, Spartan helmet logo. This repo currently contains the framework and layout only; the AI backend is a stub.
+A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Green and white, Spartan helmet logo.
+
+**Current state: UI framework only.** The layout, theme, tabs, and composer work. The AI provider, storage, and page-context pieces are stubs with documented contracts, left open for contributors. See [docs/ROADMAP.md](docs/ROADMAP.md).
+
+**AI backend: a local model** on the user's machine (not the Anthropic API, not a hosted API). The provider boundary is `src/ai/provider.js`.
 
 > New here (human or AI)? Read [CONTRIBUTING.md](CONTRIBUTING.md) first. AI coding agents also read [AGENTS.md](AGENTS.md).
 
@@ -24,13 +28,17 @@ assets/
   logo-transparent.png        Logo with white keyed out (used in the panel)
   icons/icon-{16,32,48,128}.png
 src/
-  background/service-worker.js  Opens the panel, relays tab changes
-  content/content.js            Reads page title / URL / selection on request
+  ai/provider.js                STUB: local model call (contract documented inside)
+  background/service-worker.js  Opens the panel on toolbar click
+  content/content.js            STUB: page title / URL / selection reader
   sidepanel/index.html          The side panel UI (Chat, Tools, Settings tabs)
   sidepanel/sidepanel.css       Layout styles
-  sidepanel/sidepanel.js        Tabs, chat, storage, page context
+  sidepanel/sidepanel.js        Tabs, chat rendering, composer, settings form
+  sidepanel/storage.js          STUB: chrome.storage persistence
+  sidepanel/page-context.js     STUB: current-tab context
   shared/theme.css              Color and spacing tokens (brand green lives here)
   shared/messages.js            Message types + storage keys shared by all scripts
+docs/ROADMAP.md               Open work, one row per stub
 .claude/                      Claude Code config and agents (Sonnet)
 .github/workflows/            CI + Claude GitHub Action
 ```
@@ -60,7 +68,12 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 
 - [x] Side panel opens from toolbar and keyboard shortcut
 - [x] Chat / Tools / Settings layout, light and dark theme
-- [x] Page title, URL, and selected text available to the panel
-- [x] Settings and chat history persist in `chrome.storage.local`
-- [ ] Real AI responses (see `respond()` in `src/sidepanel/sidepanel.js`)
+- [x] Local model settings fields (endpoint, model name) in the Settings tab
+- [ ] Local model provider (`src/ai/provider.js`)
+- [ ] Persistence (`src/sidepanel/storage.js`)
+- [ ] Page context (`src/sidepanel/page-context.js`, `src/content/content.js`)
 - [ ] Web Store listing assets
+
+## Using Claude on GitHub
+
+Comment `@claude` on any issue or pull request, for example `@claude implement the storage module per its contract`. The workflow in `.github/workflows/claude.yml` runs Claude Sonnet with the repo rules from `AGENTS.md`. A maintainer must first add the `ANTHROPIC_API_KEY` repository secret and install the Claude GitHub App on the repo.

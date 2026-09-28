@@ -22,4 +22,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   theme: 'system',        // 'system' | 'light' | 'dark'
   includePageContext: true,
   displayName: '',
+  // Local model settings (UI only for now; see src/ai/provider.js)
+  modelEndpoint: 'http://localhost:11434',
+  modelName: '',
 });

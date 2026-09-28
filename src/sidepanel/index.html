@@ -33,7 +33,7 @@
         <div class="empty" id="empty-state">
           <img src="../../assets/logo-transparent.png" alt="" width="96" height="96" />
           <h2>Ask Spartain</h2>
-          <p>Summarize this page, explain a selection, or ask anything. AI responses are not wired up yet; this is the layout.</p>
+          <p>Summarize this page, explain a selection, or ask anything. This build is the UI framework only; the local model is not connected yet.</p>
           <div class="chips">
             <button class="chip" data-prompt="Summarize this page">Summarize page</button>
             <button class="chip" data-prompt="Explain the selected text">Explain selection</button>
@@ -89,6 +89,16 @@
           <input type="checkbox" name="includePageContext" />
           <span>Include page title and selection with messages</span>
         </label>
+        <h3>Local model</h3>
+        <label class="field">
+          <span>Endpoint</span>
+          <input type="url" name="modelEndpoint" placeholder="http://localhost:11434" />
+        </label>
+        <label class="field">
+          <span>Model name</span>
+          <input type="text" name="modelName" placeholder="e.g. llama3" />
+        </label>
+        <p class="hint">Runs on your own machine. Nothing leaves the browser until a provider is implemented in <code>src/ai/provider.js</code>.</p>
         <div class="row">
           <button type="submit" class="btn btn--primary">Save</button>
           <button type="button" class="btn btn--danger" id="clear-history">Clear chat</button>
