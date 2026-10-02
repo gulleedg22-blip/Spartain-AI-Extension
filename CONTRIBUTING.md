@@ -24,6 +24,7 @@ AI tools otherwise tend to assume a website or a Node project and will add frame
 6. **Service worker is stateless.** Chrome kills it whenever it wants. Persist with `chrome.storage`, never with module-level variables.
 7. **Content script stays read-only and small.** It answers "what's on this page". It does not modify pages.
 8. **Run `npm run check` before pushing.** CI runs it too.
+9. **UI work follows `.claude/skills/sidepanel-ui/`.** Humans can read it too: it lists the reusable classes and has a one-command screenshot script for PRs.
 
 ## Chrome extension facts collaborators trip on
 

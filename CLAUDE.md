@@ -10,4 +10,5 @@ Quick facts:
 - Message constants only in `src/shared/messages.js`.
 - Background = service worker (no DOM). Content script = classic script (no imports).
 - Run `npm run check` before you consider a task done.
+- Any visual or layout change in the side panel: load the `sidepanel-ui` skill first (`.claude/skills/sidepanel-ui/`). It has the token rules, component recipes, and a screenshot script.
 - Delegate to the sub-agents in `.claude/agents/` (they run on Sonnet) for review and UI work.
