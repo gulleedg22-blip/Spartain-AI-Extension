@@ -16,6 +16,4 @@ Non-negotiables:
 - Justify any new manifest permission in your final summary.
 - Never add API keys or secrets.
 
-For any change under src/sidepanel/ or src/shared/theme.css, read .claude/skills/sidepanel-ui/SKILL.md first and follow its workflow, including the screenshot step.
-
 Finish every task by running `npm run check` and reporting the result. Describe how a human verifies the change by loading the unpacked extension in chrome://extensions.

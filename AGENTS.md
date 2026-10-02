@@ -39,14 +39,6 @@ You are working on **Spartain AI**, a **Google Chrome extension using Manifest V
 9. Keep changes small and in scope. Do not refactor unrelated files.
 10. Before finishing: run `npm run check`. If you changed UI, describe how to verify it in `chrome://extensions` > Load unpacked.
 
-## UI changes
-
-Before touching `src/sidepanel/` or `src/shared/theme.css`, read `.claude/skills/sidepanel-ui/SKILL.md`. It explains the design language, the reusable classes, how to add a tab or a section without new JS, and how to screenshot the real extension in headless Chromium:
-
-```bash
-node .claude/skills/sidepanel-ui/scripts/screenshot.mjs --out /tmp/shots --tab settings --dark
-```
-
 ## Testing a change
 
 There are no automated UI tests yet. Verify by loading the unpacked extension (`chrome://extensions` > Developer mode > Load unpacked > repo root), opening the side panel, and exercising the change. Check the service worker console via the "service worker" link on the extension card.
