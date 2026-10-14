@@ -1,0 +1,169 @@
+{
+  "$comment": "De La Salle High School bell schedule as observed in a student's 2026-27 calendar. Only periods that student took were observed; rows with inferred: true are extrapolated. Verify against the official DLS bell schedule before relying on it.",
+  "timeZone": "America/Los_Angeles",
+  "dayTypes": {
+    "0-7 Day": {
+      "days": [
+        "Mon"
+      ],
+      "note": "All periods, 45 min, 7 min passing",
+      "blocks": [
+        {
+          "name": "P0",
+          "start": "07:23",
+          "end": "08:08",
+          "inferred": true
+        },
+        {
+          "name": "P1",
+          "start": "08:15",
+          "end": "09:00"
+        },
+        {
+          "name": "P2",
+          "start": "09:07",
+          "end": "09:52"
+        },
+        {
+          "name": "Break",
+          "start": "09:52",
+          "end": "10:12"
+        },
+        {
+          "name": "P3",
+          "start": "10:12",
+          "end": "10:57"
+        },
+        {
+          "name": "P4",
+          "start": "11:04",
+          "end": "11:49"
+        },
+        {
+          "name": "Lunch",
+          "start": "11:49",
+          "end": "12:30"
+        },
+        {
+          "name": "P5",
+          "start": "12:30",
+          "end": "13:15"
+        },
+        {
+          "name": "P6",
+          "start": "13:22",
+          "end": "14:07"
+        },
+        {
+          "name": "P7",
+          "start": "14:14",
+          "end": "14:59",
+          "inferred": true
+        }
+      ]
+    },
+    "A-Day": {
+      "days": [
+        "Tue",
+        "Thu"
+      ],
+      "blocks": [
+        {
+          "name": "P1",
+          "start": "08:15",
+          "end": "09:35"
+        },
+        {
+          "name": "Announcements",
+          "start": "09:35",
+          "end": "09:55"
+        },
+        {
+          "name": "P2",
+          "start": "09:55",
+          "end": "11:20"
+        },
+        {
+          "name": "Lunch",
+          "start": "11:20",
+          "end": "12:00"
+        },
+        {
+          "name": "P3",
+          "start": "12:00",
+          "end": "13:20"
+        },
+        {
+          "name": "P7 / College Advisory",
+          "start": "13:30",
+          "end": "14:30",
+          "inferred": true,
+          "note": "Advisory observed 13:30-14:30 on some A-days; P7 placement is a guess"
+        }
+      ]
+    },
+    "B-Day": {
+      "days": [
+        "Wed",
+        "Fri"
+      ],
+      "blocks": [
+        {
+          "name": "P4",
+          "start": "08:15",
+          "end": "09:35"
+        },
+        {
+          "name": "Break",
+          "start": "09:35",
+          "end": "09:55"
+        },
+        {
+          "name": "P5",
+          "start": "09:55",
+          "end": "11:15"
+        },
+        {
+          "name": "Lunch + Academic Time",
+          "start": "11:15",
+          "end": "12:20",
+          "note": "split unknown"
+        },
+        {
+          "name": "P6",
+          "start": "12:20",
+          "end": "13:40"
+        }
+      ]
+    },
+    "B-Day Late Start": {
+      "days": [
+        "Wed, occasional"
+      ],
+      "blocks": [
+        {
+          "name": "P4",
+          "start": "09:30",
+          "end": "10:50"
+        },
+        {
+          "name": "P5",
+          "start": "11:10",
+          "end": "12:30"
+        },
+        {
+          "name": "Lunch",
+          "start": "12:30",
+          "end": "13:35",
+          "inferred": true
+        },
+        {
+          "name": "P6",
+          "start": "13:35",
+          "end": "14:55"
+        }
+      ]
+    }
+  },
+  "school": "De La Salle High School"
+}

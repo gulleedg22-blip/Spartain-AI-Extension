@@ -24,6 +24,7 @@ You are working on **Spartain AI**, a **Google Chrome extension using Manifest V
 | Reading the current web page | `src/content/content.js` (stub) + `src/sidepanel/page-context.js` (stub) |
 | Model call | `src/ai/provider.js` (stub) |
 | Persistence | `src/sidepanel/storage.js` (stub) |
+| Static data (bell schedule, example profile) | `src/data/*.json`. Never commit a real student's grades |
 | Open work list | `docs/ROADMAP.md` |
 
 ## Rules

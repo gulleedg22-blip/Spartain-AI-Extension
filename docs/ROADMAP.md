@@ -11,6 +11,8 @@ The AI backend is a **local model** running on the user's machine (for example a
 | [#3](https://github.com/gulleedg22-blip/Spartain-AI-Extension/issues/3) | Page context | `src/sidepanel/page-context.js` + `src/content/content.js` | `getPageContext() -> { title, url, selection }` |
 | [#4](https://github.com/gulleedg22-blip/Spartain-AI-Extension/issues/4) | Tab change events | `src/background/service-worker.js` | Send `MSG.TAB_CHANGED` to the panel on `chrome.tabs.onActivated` / `onUpdated` |
 | 5 | Tools tab features | `src/sidepanel/index.html` + new modules | Study guide, flashcards, citation helper (layout placeholders exist) |
+| 5a | Schedule view | `src/data/bell-schedule.json` + Tools tab | Show today's day type and current/next period. Data is in place; load it with `fetch(chrome.runtime.getURL('src/data/bell-schedule.json'))` |
+| 5b | Student profile | `src/data/profile.example.json` + `storage.js` | Let the user enter classes per period; the example file is the shape. Real profiles stay in `chrome.storage`, never in the repo |
 | 6 | Streaming replies | `src/ai/provider.js` + `sidepanel.js` | Optional `onToken` callback; keep the `Promise<string>` return |
 | 7 | Web Store packaging | `scripts/zip.mjs`, listing assets | Screenshots, promo tile, privacy text |
 

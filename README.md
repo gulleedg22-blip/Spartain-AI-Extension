@@ -38,6 +38,8 @@ src/
   sidepanel/page-context.js     STUB: current-tab context
   shared/theme.css              Color and spacing tokens (brand green lives here)
   shared/messages.js            Message types + storage keys shared by all scripts
+  data/bell-schedule.json       DLS bell schedule by day type (observed, inferred rows flagged)
+  data/profile.example.json     Example student profile shape with made-up grades
 docs/ROADMAP.md               Open work, one row per stub
 .claude/                      Claude Code config and agents (Sonnet)
 .github/workflows/            CI + Claude GitHub Action
