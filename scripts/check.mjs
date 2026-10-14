@@ -43,4 +43,10 @@ for (const f of walk('src').concat(['src/sidepanel/sidepanel.css', 'src/sidepane
 // 4. content script must not use ES module syntax
 if (/^\s*(import|export)\s/m.test(readFileSync('src/content/content.js', 'utf8'))) fail('content.js must not use import/export');
 
+// 5. every JSON file under src/data parses
+for (const f of readdirSync('src/data').filter((n) => n.endsWith('.json'))) {
+  try { JSON.parse(readFileSync(join('src/data', f), 'utf8')); ok(`json: src/data/${f}`); }
+  catch (e) { fail(`invalid JSON in src/data/${f}: ${e.message}`); }
+}
+
 process.exit(failed ? 1 : 0);
