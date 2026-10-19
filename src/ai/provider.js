@@ -24,7 +24,8 @@ export class ProviderNotConfiguredError extends Error {
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
-const ANTHROPIC_MODEL = 'claude-sonnet-5-5';
+const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-5-5';
+const ANTHROPIC_MODELS = new Set(['claude-sonnet-5-5', 'claude-haiku-4-5', 'claude-opus-5-5']);
 const MAX_TOKENS = 1024;
 
 function systemPrompt(context, settings) {
@@ -78,8 +79,9 @@ async function generateLocal({ messages, context, settings, signal }) {
 }
 
 function anthropicBody({ messages, context, settings }) {
+  const model = ANTHROPIC_MODELS.has(settings.anthropicModel) ? settings.anthropicModel : DEFAULT_ANTHROPIC_MODEL;
   return JSON.stringify({
-    model: ANTHROPIC_MODEL,
+    model,
     max_tokens: MAX_TOKENS,
     fallbacks: 'default',
     system: systemPrompt(context, settings),

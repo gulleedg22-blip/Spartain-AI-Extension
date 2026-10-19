@@ -11,7 +11,7 @@
 // Hard limits below protect your bill: model allowlist, max_tokens cap,
 // request size cap. Also set a monthly spend limit in the Anthropic console.
 
-const ALLOWED_MODELS = new Set(['claude-sonnet-5-5', 'claude-haiku-4-5']);
+const ALLOWED_MODELS = new Set(['claude-sonnet-5-5', 'claude-haiku-4-5', 'claude-opus-5-5']); // remove opus to cap cost
 const MAX_TOKENS_CAP = 1024;
 const MAX_BODY_BYTES = 200_000;
 

@@ -26,7 +26,7 @@ Extension > Settings > Provider: **Team proxy**. Enter the proxy URL and the pas
 
 ## Limits built in
 
-- Model allowlist: `claude-sonnet-5-5`, `claude-haiku-4-5`
+- Model allowlist: `claude-sonnet-5-5`, `claude-haiku-4-5`, `claude-opus-5-5` (drop Opus from `ALLOWED_MODELS` in `worker.js` to cap cost)
 - `max_tokens` capped at 1024 per reply
 - Request body capped at 200 KB
 - Wrong passcode: 401, nothing forwarded

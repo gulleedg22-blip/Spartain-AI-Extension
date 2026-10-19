@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   provider: 'local',      // 'local' (Ollama) | 'anthropic' (user's own key) | 'proxy' (team proxy + passcode)
   modelEndpoint: 'http://localhost:11434',
   modelName: 'llama3',
+  anthropicModel: 'claude-sonnet-5-5', // used by the 'anthropic' and 'proxy' providers
   anthropicApiKey: '',    // stored only in chrome.storage.local on this computer
   proxyUrl: '',           // e.g. https://spartain-proxy.yourname.workers.dev
   proxyPasscode: '',

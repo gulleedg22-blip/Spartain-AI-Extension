@@ -109,6 +109,16 @@
           </label>
           <p class="hint">Install Ollama, run <code>ollama pull llama3</code>, and keep it running. Nothing leaves your computer.</p>
         </div>
+        <div data-provider-fields="anthropic proxy" hidden>
+          <label class="field">
+            <span>Claude model</span>
+            <select name="anthropicModel">
+              <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (recommended)</option>
+              <option value="claude-haiku-4-5">Claude Haiku 4.5 (fastest, cheapest)</option>
+              <option value="claude-opus-5-5">Claude Opus 5.5 (strongest, about 2x the cost)</option>
+            </select>
+          </label>
+        </div>
         <div data-provider-fields="proxy" hidden>
           <label class="field">
             <span>Proxy URL</span>
