@@ -1,0 +1,167 @@
+{
+  "$comment": "De La Salle High School 2026-27 calendar framework (updated 5/12/2026) plus observed day types for October 2026. Source: CalendarFramework_26-27.pdf and the dlshs.org calendar printout.",
+  "schoolYear": "2026-2027",
+  "semesters": {
+    "s1": {
+      "firstDay": "2026-08-14",
+      "quarter1Ends": "2026-10-02",
+      "finals": [
+        "2026-12-15",
+        "2026-12-18"
+      ],
+      "ends": "2026-12-18"
+    },
+    "s2": {
+      "begins": "2027-01-11",
+      "quarter3Ends": "2027-03-05",
+      "seniorsLastDay": "2027-05-12",
+      "finals": [
+        "2027-05-24",
+        "2027-05-27"
+      ],
+      "ends": "2027-05-27"
+    }
+  },
+  "noClasses": [
+    {
+      "date": "2026-08-10",
+      "label": "Faculty/Staff Professional Days"
+    },
+    {
+      "date": "2026-08-11",
+      "label": "Faculty/Staff Professional Days"
+    },
+    {
+      "date": "2026-09-04",
+      "label": "Faculty/Staff Retreat"
+    },
+    {
+      "date": "2026-09-07",
+      "label": "Labor Day"
+    },
+    {
+      "date": "2026-10-12",
+      "label": "School Holiday"
+    },
+    {
+      "date": "2026-10-13",
+      "label": "Faculty/Staff Professional Day"
+    },
+    {
+      "date": "2026-11-06",
+      "label": "Faculty/Staff Professional Day"
+    },
+    {
+      "date": "2026-11-09",
+      "label": "Veterans Day"
+    },
+    {
+      "date": "2026-11-23",
+      "label": "Thanksgiving Week",
+      "through": "2026-11-27"
+    },
+    {
+      "date": "2026-12-21",
+      "label": "Christmas Break begins"
+    },
+    {
+      "date": "2027-01-05",
+      "label": "New Faculty/Staff Orientations",
+      "through": "2027-01-07",
+      "note": "no classes for students"
+    },
+    {
+      "date": "2027-01-07",
+      "label": "Faculty Professional Days",
+      "through": "2027-01-08"
+    },
+    {
+      "date": "2027-01-18",
+      "label": "Martin Luther King Jr. Holiday"
+    },
+    {
+      "date": "2027-02-12",
+      "label": "Faculty/Staff Professional Day"
+    },
+    {
+      "date": "2027-02-15",
+      "label": "Presidents' Day"
+    },
+    {
+      "date": "2027-03-12",
+      "label": "Faculty/Staff Professional Day"
+    },
+    {
+      "date": "2027-03-24",
+      "label": "Easter Break begins",
+      "classesResume": "2027-04-05"
+    },
+    {
+      "date": "2027-04-23",
+      "label": "Faculty/Staff Professional Day"
+    },
+    {
+      "date": "2027-05-28",
+      "label": "Faculty/Staff Professional Day"
+    }
+  ],
+  "specialDays": [
+    {
+      "date": "2026-08-12",
+      "label": "Freshman & Transfer Orientation"
+    },
+    {
+      "date": "2026-08-13",
+      "label": "Sophomore, Junior & Senior Orientation"
+    },
+    {
+      "date": "2026-09-03",
+      "label": "Back-to-School Night"
+    },
+    {
+      "date": "2026-10-14",
+      "label": "10th & 11th Grade Testing Day; Freshman Retreat; Senior College Application Workshop"
+    },
+    {
+      "date": "2027-05-03",
+      "label": "AP Testing begins",
+      "through": "2027-05-14"
+    },
+    {
+      "date": "2027-05-14",
+      "label": "Baccalaureate Mass"
+    },
+    {
+      "date": "2027-05-16",
+      "label": "Graduation, Class of 2027"
+    }
+  ],
+  "dayTypesObserved": {
+    "$comment": "October 2026 from the school calendar. Weekday pattern: Mon 0-7, Tue A, Wed B (often a variant), Thu A, Fri B.",
+    "2026-09-28": "0-7",
+    "2026-09-29": "A-Day",
+    "2026-09-30": "B-Day Academic Time",
+    "2026-10-01": "A-Day",
+    "2026-10-02": "B-Day",
+    "2026-10-05": "0-7",
+    "2026-10-06": "A-Day",
+    "2026-10-07": "B-Day Mass or Assembly",
+    "2026-10-08": "A-Day",
+    "2026-10-09": "B-Day",
+    "2026-10-12": "No classes",
+    "2026-10-13": "No classes",
+    "2026-10-14": "Testing day (no regular periods)",
+    "2026-10-15": "A-Day",
+    "2026-10-16": "B-Day",
+    "2026-10-19": "0-7",
+    "2026-10-20": "A-Day",
+    "2026-10-21": "B-Day Late Start",
+    "2026-10-22": "A-Day",
+    "2026-10-23": "B-Day Rally",
+    "2026-10-26": "0-7",
+    "2026-10-27": "A-Day",
+    "2026-10-28": "B-Day Academic Time",
+    "2026-10-29": "A-Day",
+    "2026-10-30": "B-Day"
+  }
+}

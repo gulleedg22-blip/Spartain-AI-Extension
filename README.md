@@ -36,7 +36,8 @@ src/
   sidepanel/page-context.js     Current-tab context
   shared/theme.css              Color and spacing tokens (brand green lives here)
   shared/messages.js            Message types + storage keys shared by all scripts
-  data/bell-schedule.json       DLS bell schedule by day type (observed, inferred rows flagged)
+  data/bell-schedule.json       Official DLS bell schedule, six day types
+  data/school-calendar-2026-27.json  Semester dates, no-class days, observed day types
   data/profile.example.json     Example student profile shape with made-up grades
 proxy/                        Optional Cloudflare Worker that holds a shared key behind a passcode
 docs/ROADMAP.md               Open work

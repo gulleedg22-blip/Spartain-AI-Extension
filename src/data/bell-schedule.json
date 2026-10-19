@@ -1,18 +1,26 @@
 {
-  "$comment": "De La Salle High School bell schedule as observed in a student's 2026-27 calendar. Only periods that student took were observed; rows with inferred: true are extrapolated. Verify against the official DLS bell schedule before relying on it.",
+  "$comment": "Official De La Salle High School bell schedules (2025-26 sheet, verified against the 2026-27 school calendar; unchanged between the two years). Times are 24h, America/Los_Angeles. Source: 2025-26BellSchedule.pdf from dlshs.org.",
+  "school": "De La Salle High School",
   "timeZone": "America/Los_Angeles",
+  "rules": [
+    "Co-curricular activities begin no earlier than 10 minutes after the final bell.",
+    "Academic Time is protected tutorial time; co-curricular activities may not take place during it."
+  ],
+  "weeklyPattern": {
+    "Mon": "0-7",
+    "Tue": "A-Day",
+    "Wed": "B-Day (or a B-Day variant: Late Start, Mass or Assembly, Rally, Academic Time)",
+    "Thu": "A-Day",
+    "Fri": "B-Day (or a B-Day variant)"
+  },
   "dayTypes": {
-    "0-7 Day": {
-      "days": [
-        "Mon"
-      ],
-      "note": "All periods, 45 min, 7 min passing",
+    "0-7": {
+      "note": "All seven periods, 45 min each",
       "blocks": [
         {
           "name": "P0",
-          "start": "07:23",
-          "end": "08:08",
-          "inferred": true
+          "start": "07:15",
+          "end": "08:05"
         },
         {
           "name": "P1",
@@ -56,30 +64,31 @@
         },
         {
           "name": "P7",
-          "start": "14:14",
-          "end": "14:59",
-          "inferred": true
+          "start": "14:15",
+          "end": "15:00"
         }
       ]
     },
     "A-Day": {
-      "days": [
-        "Tue",
-        "Thu"
-      ],
+      "note": "Periods 1, 2, 3, 7",
       "blocks": [
+        {
+          "name": "P0",
+          "start": "07:15",
+          "end": "08:05"
+        },
         {
           "name": "P1",
           "start": "08:15",
           "end": "09:35"
         },
         {
-          "name": "Announcements",
+          "name": "Break",
           "start": "09:35",
           "end": "09:55"
         },
         {
-          "name": "P2",
+          "name": "P2 + Announcements",
           "start": "09:55",
           "end": "11:20"
         },
@@ -94,20 +103,21 @@
           "end": "13:20"
         },
         {
-          "name": "P7 / College Advisory",
+          "name": "P7",
           "start": "13:30",
-          "end": "14:30",
-          "inferred": true,
-          "note": "Advisory observed 13:30-14:30 on some A-days; P7 placement is a guess"
+          "end": "14:50"
         }
       ]
     },
     "B-Day": {
-      "days": [
-        "Wed",
-        "Fri"
-      ],
+      "note": "Periods 4, 5, 6; Academic Time only on days marked 'B-Day Academic Time'",
       "blocks": [
+        {
+          "name": "P0",
+          "start": "07:15",
+          "end": "08:05",
+          "optional": true
+        },
         {
           "name": "P4",
           "start": "08:15",
@@ -124,27 +134,94 @@
           "end": "11:15"
         },
         {
-          "name": "Lunch + Academic Time",
-          "start": "11:15",
-          "end": "12:20",
-          "note": "split unknown"
+          "name": "House Time",
+          "start": "11:20",
+          "end": "11:40"
+        },
+        {
+          "name": "Lunch",
+          "start": "11:40",
+          "end": "12:20"
         },
         {
           "name": "P6",
           "start": "12:20",
           "end": "13:40"
+        },
+        {
+          "name": "Academic Time",
+          "start": "13:40",
+          "end": "14:30",
+          "optional": true
         }
       ]
     },
     "B-Day Late Start": {
-      "days": [
-        "Wed, occasional"
-      ],
+      "note": "Wednesday variant",
       "blocks": [
+        {
+          "name": "Tutorial & Meetings",
+          "start": "08:15",
+          "end": "09:15"
+        },
         {
           "name": "P4",
           "start": "09:30",
           "end": "10:50"
+        },
+        {
+          "name": "Break",
+          "start": "10:50",
+          "end": "11:10"
+        },
+        {
+          "name": "P5",
+          "start": "11:10",
+          "end": "12:30"
+        },
+        {
+          "name": "House Time",
+          "start": "12:35",
+          "end": "12:55"
+        },
+        {
+          "name": "Lunch",
+          "start": "12:55",
+          "end": "13:35"
+        },
+        {
+          "name": "P6",
+          "start": "13:35",
+          "end": "14:55"
+        }
+      ]
+    },
+    "B-Day Mass or Assembly": {
+      "blocks": [
+        {
+          "name": "P0",
+          "start": "07:15",
+          "end": "08:05"
+        },
+        {
+          "name": "P4",
+          "start": "08:15",
+          "end": "09:35"
+        },
+        {
+          "name": "Break",
+          "start": "09:35",
+          "end": "09:55"
+        },
+        {
+          "name": "House Time",
+          "start": "09:55",
+          "end": "10:00"
+        },
+        {
+          "name": "Mass / Assembly",
+          "start": "10:00",
+          "end": "11:10"
         },
         {
           "name": "P5",
@@ -154,16 +231,59 @@
         {
           "name": "Lunch",
           "start": "12:30",
-          "end": "13:35",
-          "inferred": true
+          "end": "13:10"
         },
         {
           "name": "P6",
+          "start": "13:10",
+          "end": "14:30"
+        }
+      ]
+    },
+    "B-Day Rally": {
+      "blocks": [
+        {
+          "name": "P0",
+          "start": "07:15",
+          "end": "08:05",
+          "optional": true
+        },
+        {
+          "name": "P4",
+          "start": "08:15",
+          "end": "09:35"
+        },
+        {
+          "name": "Break",
+          "start": "09:35",
+          "end": "09:55"
+        },
+        {
+          "name": "P5 + Announcements",
+          "start": "09:55",
+          "end": "11:20"
+        },
+        {
+          "name": "Lunch",
+          "start": "11:20",
+          "end": "12:00"
+        },
+        {
+          "name": "P6",
+          "start": "12:00",
+          "end": "13:20"
+        },
+        {
+          "name": "House Time",
+          "start": "13:25",
+          "end": "13:35"
+        },
+        {
+          "name": "Rally",
           "start": "13:35",
-          "end": "14:55"
+          "end": "14:20"
         }
       ]
     }
-  },
-  "school": "De La Salle High School"
+  }
 }
