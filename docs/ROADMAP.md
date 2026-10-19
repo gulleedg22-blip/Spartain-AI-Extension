@@ -1,15 +1,12 @@
 # Roadmap: open work
 
-This repo is the **UI framework** for the Spartain AI Chrome side panel. The pieces below are intentionally unbuilt so contributors can pick them up. Each has a GitHub issue; comment `@claude` on the issue to have Claude draft the change.
+The Spartain AI Chrome side panel has a working chat. The pieces below are open for contributors. Each has a GitHub issue; comment `@claude` on the issue to have Claude draft the change.
 
-The AI backend is a **local model** running on the user's machine (for example an HTTP server on `localhost`). It is **not** the Anthropic API and not any hosted API.
+The AI backend is a **local model** (Ollama) by default, or the Anthropic API with a key each user enters in Settings. No key is ever stored in the repo.
 
 | # | Component | Where | Contract |
 |---|---|---|---|
-| [#1](https://github.com/gulleedg22-blip/Spartain-AI-Extension/issues/1) | Local model provider | `src/ai/provider.js` | `generate({ messages, context, settings, signal }) -> Promise<string>` |
-| [#2](https://github.com/gulleedg22-blip/Spartain-AI-Extension/issues/2) | Persistence | `src/sidepanel/storage.js` | `loadSettings / saveSettings / loadHistory / saveHistory / clearHistory` on `chrome.storage.local` |
-| [#3](https://github.com/gulleedg22-blip/Spartain-AI-Extension/issues/3) | Page context | `src/sidepanel/page-context.js` + `src/content/content.js` | `getPageContext() -> { title, url, selection }` |
-| [#4](https://github.com/gulleedg22-blip/Spartain-AI-Extension/issues/4) | Tab change events | `src/background/service-worker.js` | Send `MSG.TAB_CHANGED` to the panel on `chrome.tabs.onActivated` / `onUpdated` |
+| done | Provider, persistence, page context, tab events | `src/ai/provider.js`, `src/sidepanel/storage.js`, `src/sidepanel/page-context.js`, `src/background/service-worker.js` | Shipped in v0.2.0 |
 | 5 | Tools tab features | `src/sidepanel/index.html` + new modules | Study guide, flashcards, citation helper (layout placeholders exist) |
 | 5a | Schedule view | `src/data/bell-schedule.json` + Tools tab | Show today's day type and current/next period. Data is in place; load it with `fetch(chrome.runtime.getURL('src/data/bell-schedule.json'))` |
 | 5b | Student profile | `src/data/profile.example.json` + `storage.js` | Let the user enter classes per period; the example file is the shape. Real profiles stay in `chrome.storage`, never in the repo |

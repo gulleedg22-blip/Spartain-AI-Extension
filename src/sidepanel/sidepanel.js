@@ -1,9 +1,8 @@
 // Side panel UI. Vanilla JS, no build step.
-// This file owns LAYOUT BEHAVIOUR ONLY: tabs, rendering messages, the
-// composer, theme, and the settings form. Everything that does real work is
-// behind three boundaries that are still open for contributors:
-//   src/ai/provider.js          -> the local model call
-//   src/sidepanel/storage.js    -> chrome.storage persistence
+// This file owns UI behaviour: tabs, rendering messages, the composer, theme,
+// and the settings form. Real work lives behind three modules:
+//   src/ai/provider.js            -> the model call (local Ollama or user's own Anthropic key)
+//   src/sidepanel/storage.js      -> chrome.storage persistence
 //   src/sidepanel/page-context.js -> what is on the current tab
 
 import { MSG, DEFAULT_SETTINGS } from '../shared/messages.js';
@@ -64,9 +63,18 @@ function fillSettingsForm() {
   f.displayName.value = settings.displayName;
   f.theme.value = settings.theme;
   f.includePageContext.checked = settings.includePageContext;
+  f.provider.value = settings.provider;
   f.modelEndpoint.value = settings.modelEndpoint;
   f.modelName.value = settings.modelName;
+  f.anthropicApiKey.value = settings.anthropicApiKey ?? '';
+  showProviderFields(f.provider.value);
 }
+function showProviderFields(provider) {
+  els.settingsForm.querySelectorAll('[data-provider-fields]').forEach((el) => {
+    el.hidden = el.dataset.providerFields !== provider;
+  });
+}
+els.settingsForm.elements.provider.addEventListener('change', (e) => showProviderFields(e.target.value));
 els.settingsForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = els.settingsForm.elements;
@@ -75,12 +83,14 @@ els.settingsForm.addEventListener('submit', async (e) => {
     displayName: f.displayName.value.trim(),
     theme: f.theme.value,
     includePageContext: f.includePageContext.checked,
+    provider: f.provider.value,
     modelEndpoint: f.modelEndpoint.value.trim(),
     modelName: f.modelName.value.trim(),
+    anthropicApiKey: f.anthropicApiKey.value.trim(),
   };
   await saveSettings(settings);
   applyTheme();
-  flash('Saved (in memory only until storage is implemented).');
+  flash('Saved.');
 });
 els.clearHistory.addEventListener('click', async () => {
   history = [];
@@ -130,16 +140,19 @@ async function sendMessage() {
 
   const context = settings.includePageContext ? await getPageContext() : null;
   const pending = renderMessage('ai', 'Thinking…', true);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120000);
   try {
-    const reply = await generate({ messages: history, context, settings, signal: undefined });
+    const reply = await generate({ messages: history, context, settings, signal: controller.signal });
     pending.textContent = reply;
     history.push({ role: 'ai', text: reply, at: Date.now() });
   } catch (err) {
     pending.textContent = err instanceof ProviderNotConfiguredError
-      ? 'No model connected yet. This build is the UI framework only.'
-      : `Error: ${err?.message ?? err}`;
+      ? `${err.message}`
+      : err?.name === 'AbortError' ? 'Timed out waiting for the model.' : `Error: ${err?.message ?? err}`;
     pending.classList.add('is-error');
   } finally {
+    clearTimeout(timeout);
     pending.classList.remove('is-pending');
     els.send.disabled = false;
     await saveHistory(history);

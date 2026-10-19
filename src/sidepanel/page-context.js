@@ -1,17 +1,17 @@
-// Page-context boundary: what is on the user's current tab.
-// NOT IMPLEMENTED YET; left open for contributors. See docs/ROADMAP.md.
-//
-// Contract the UI relies on:
-//   getPageContext() -> Promise<{ title: string, url: string, selection: string }>
-//
-// Intended design: query the active tab with chrome.tabs.query, then
-// chrome.tabs.sendMessage(tabId, { type: MSG.GET_PAGE_CONTEXT }) to the
-// content script in src/content/content.js, which answers with the title,
-// URL, and selected text. Fall back to tab.title / tab.url when the content
-// script is not injected (chrome:// pages, tabs opened before install).
-// Wrap sendMessage in try/catch; the receiver may not exist.
+// What is on the user's current tab: { title, url, selection }.
+// Asks the content script; falls back to tab metadata when it is not injected
+// (chrome:// pages, the Web Store, tabs opened before the extension was installed).
+
+import { MSG } from '../shared/messages.js';
 
 export async function getPageContext() {
-  // TODO(contributors)
-  return { title: '', url: '', selection: '' };
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const fallback = { title: tab?.title ?? '', url: tab?.url ?? '', selection: '' };
+  if (!tab?.id || !/^https?:/.test(tab.url ?? '')) return fallback;
+  try {
+    const ctx = await chrome.tabs.sendMessage(tab.id, { type: MSG.GET_PAGE_CONTEXT });
+    return { ...fallback, ...(ctx ?? {}) };
+  } catch {
+    return fallback;
+  }
 }
