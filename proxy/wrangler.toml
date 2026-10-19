@@ -1,4 +1,4 @@
-name = "spartain-proxy"
+name = "spartan-proxy"
 main = "worker.js"
 compatibility_date = "2026-01-01"
 # Secrets are NOT in this file. Set them with:

@@ -1,8 +1,8 @@
 {
-  "name": "spartain-ai-extension",
+  "name": "spartan-ai-extension",
   "version": "0.1.0",
   "private": true,
-  "description": "Spartain AI Chrome extension (Manifest V3, side panel)",
+  "description": "Spartan AI Chrome extension (Manifest V3, side panel)",
   "type": "module",
   "scripts": {
     "check": "node scripts/check.mjs",

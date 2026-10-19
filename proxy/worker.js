@@ -1,4 +1,4 @@
-// Spartain AI team proxy. Deploy on Cloudflare Workers (free tier is enough).
+// Spartan AI team proxy. Deploy on Cloudflare Workers (free tier is enough).
 //
 // Holds ONE Anthropic API key as a Worker secret and forwards chat requests
 // from the extension. The extension never sees the key; it sends a passcode.
@@ -18,7 +18,7 @@ const MAX_BODY_BYTES = 200_000;
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'POST, OPTIONS',
-  'access-control-allow-headers': 'content-type, x-spartain-passcode',
+  'access-control-allow-headers': 'content-type, x-spartan-passcode',
 };
 
 function reply(status, body, extra = {}) {
@@ -32,7 +32,7 @@ export default {
     if (request.method !== 'POST') return err(405, 'POST only');
     if (!env.PASSCODE || !env.ANTHROPIC_API_KEY) return err(500, 'Proxy is not configured');
 
-    const pass = request.headers.get('x-spartain-passcode') ?? '';
+    const pass = request.headers.get('x-spartan-passcode') ?? '';
     if (!timingSafeEqual(pass, env.PASSCODE)) return err(401, 'Wrong passcode');
 
     const raw = await request.text();

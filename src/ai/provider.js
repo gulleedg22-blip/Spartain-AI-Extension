@@ -30,7 +30,7 @@ const MAX_TOKENS = 1024;
 
 function systemPrompt(context, settings) {
   const who = settings.displayName ? ` The user's name is ${settings.displayName}.` : '';
-  let s = `You are Spartain AI, a concise study assistant for De La Salle High School students, in a Chrome side panel.${who} Answer plainly and briefly.`;
+  let s = `You are Spartan AI, a concise study assistant for De La Salle High School students, in a Chrome side panel.${who} Answer plainly and briefly.`;
   if (context?.title || context?.url) {
     s += `\n\nThe user is viewing: "${context.title}" (${context.url}).`;
   }
@@ -111,7 +111,7 @@ async function generateProxy(args) {
   const res = await fetch(url, {
     method: 'POST',
     signal,
-    headers: { 'content-type': 'application/json', 'x-spartain-passcode': settings.proxyPasscode },
+    headers: { 'content-type': 'application/json', 'x-spartan-passcode': settings.proxyPasscode },
     body: anthropicBody(args),
   }).catch((e) => { throw new Error(`Could not reach the proxy at ${url} (${e.message}).`); });
   return readAnthropicResponse(res, 'proxy');

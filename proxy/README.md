@@ -17,7 +17,7 @@ If the passcode leaks: change the passcode. The key never left the Worker.
    npx wrangler deploy
    ```
 
-3. Wrangler prints a URL like `https://spartain-proxy.<your-name>.workers.dev`. That is the proxy URL.
+3. Wrangler prints a URL like `https://spartan-proxy.<your-name>.workers.dev`. That is the proxy URL.
 4. In the Anthropic console, set a monthly spend limit. Everyone using the passcode bills this key.
 
 ## Use (everyone)
@@ -31,4 +31,4 @@ Extension > Settings > Provider: **Team proxy**. Enter the proxy URL and the pas
 - Request body capped at 200 KB
 - Wrong passcode: 401, nothing forwarded
 
-Add Cloudflare rate limiting in the dashboard if usage grows. Rotate the passcode from the dashboard (Workers > spartain-proxy > Settings > Variables) or with `wrangler secret put PASSCODE`.
+Add Cloudflare rate limiting in the dashboard if usage grows. Rotate the passcode from the dashboard (Workers > spartan-proxy > Settings > Variables) or with `wrangler secret put PASSCODE`.

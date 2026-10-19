@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Spartain AI",
-  "short_name": "Spartain",
-  "description": "Spartain AI side panel for Chrome. Built for Spartans, in green and white.",
-  "version": "0.3.0",
+  "name": "Spartan AI",
+  "short_name": "Spartan",
+  "description": "Spartan AI side panel for Chrome. Built for Spartans, in green and white.",
+  "version": "0.4.0",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "assets/icons/icon-16.png",
@@ -12,7 +12,7 @@
     "128": "assets/icons/icon-128.png"
   },
   "action": {
-    "default_title": "Open Spartain AI",
+    "default_title": "Open Spartan AI",
     "default_icon": {
       "16": "assets/icons/icon-16.png",
       "32": "assets/icons/icon-32.png"
@@ -46,7 +46,8 @@
     "http://localhost/*",
     "http://127.0.0.1/*",
     "https://api.anthropic.com/*",
-    "https://*.workers.dev/*"
+    "https://*.workers.dev/*",
+    "https://raw.githubusercontent.com/*"
   ],
   "commands": {
     "_execute_action": {
@@ -54,7 +55,7 @@
         "default": "Ctrl+Shift+S",
         "mac": "Command+Shift+S"
       },
-      "description": "Toggle the Spartain AI side panel"
+      "description": "Toggle the Spartan AI side panel"
     }
   }
 }

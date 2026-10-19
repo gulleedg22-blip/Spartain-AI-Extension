@@ -1,4 +1,4 @@
-# Contributing to Spartain AI
+# Contributing to Spartan AI
 
 ## What this project is
 

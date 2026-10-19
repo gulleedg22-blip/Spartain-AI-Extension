@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Spartain AI</title>
+  <title>Spartan AI</title>
   <link rel="stylesheet" href="../shared/theme.css" />
   <link rel="stylesheet" href="./sidepanel.css" />
 </head>
@@ -14,11 +14,16 @@
     <header class="header">
       <img class="header__logo" src="../../assets/icons/icon-48.png" alt="" width="32" height="32" />
       <div class="header__text">
-        <h1 class="header__title">Spartain AI</h1>
+        <h1 class="header__title">Spartan AI</h1>
         <p class="header__subtitle" id="page-title">No page context</p>
       </div>
       <span class="status" id="status" title="Background worker status">●</span>
     </header>
+
+    <div class="banner" id="update-banner" hidden>
+      <span id="update-text"></span>
+      <button class="btn btn--small" id="update-reload">Reload</button>
+    </div>
 
     <!-- Tabs -->
     <nav class="tabs" role="tablist" aria-label="Sections">
@@ -32,7 +37,7 @@
       <div class="messages" id="messages" aria-live="polite">
         <div class="empty" id="empty-state">
           <img src="../../assets/logo-transparent.png" alt="" width="96" height="96" />
-          <h2>Ask Spartain</h2>
+          <h2>Ask Spartan</h2>
           <p>Summarize this page, explain a selection, or ask anything. Pick a provider in Settings first.</p>
           <div class="chips">
             <button class="chip" data-prompt="Summarize this page">Summarize page</button>
@@ -42,7 +47,7 @@
         </div>
       </div>
       <form class="composer" id="composer">
-        <textarea id="input" class="composer__input" rows="1" placeholder="Message Spartain…" aria-label="Message"></textarea>
+        <textarea id="input" class="composer__input" rows="1" placeholder="Message Spartan…" aria-label="Message"></textarea>
         <button type="submit" class="btn btn--primary composer__send" id="send" aria-label="Send">Send</button>
       </form>
       <p class="hint"><kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line.</p>
@@ -59,13 +64,23 @@
         </dl>
         <button class="btn" id="refresh-context">Refresh</button>
       </div>
+      <div class="card" id="schedule-card">
+        <h3>Schedule</h3>
+        <p class="schedule__day" id="schedule-day">Loading…</p>
+        <p class="schedule__now" id="schedule-now"></p>
+        <ol class="blocks" id="schedule-blocks"></ol>
+      </div>
       <div class="card">
-        <h3>Coming soon</h3>
-        <ul class="list">
-          <li>Study guide from page</li>
-          <li>Flashcards from selection</li>
-          <li>Citation helper</li>
-        </ul>
+        <h3>Page tools</h3>
+        <p class="hint">Each one sends a prompt to the AI with the current page attached.</p>
+        <div class="tools">
+          <button class="btn tool" data-tool="summarize">Summarize page</button>
+          <button class="btn tool" data-tool="explain">Explain selection</button>
+          <button class="btn tool" data-tool="studyguide">Study guide</button>
+          <button class="btn tool" data-tool="flashcards">Flashcards</button>
+          <button class="btn tool" data-tool="cite">Cite this page</button>
+          <button class="btn tool" data-tool="quiz">Quiz me</button>
+        </div>
       </div>
     </section>
 
@@ -88,6 +103,10 @@
         <label class="field field--check">
           <input type="checkbox" name="includePageContext" />
           <span>Include page title and selection with messages</span>
+        </label>
+        <label class="field field--check">
+          <input type="checkbox" name="checkForUpdates" />
+          <span>Check GitHub for new versions once an hour</span>
         </label>
         <h3>AI provider</h3>
         <label class="field">
@@ -122,7 +141,7 @@
         <div data-provider-fields="proxy" hidden>
           <label class="field">
             <span>Proxy URL</span>
-            <input type="url" name="proxyUrl" placeholder="https://spartain-proxy.example.workers.dev" />
+            <input type="url" name="proxyUrl" placeholder="https://spartan-proxy.example.workers.dev" />
           </label>
           <label class="field">
             <span>Passcode</span>
@@ -143,7 +162,7 @@
         </div>
         <p class="hint" id="settings-status"></p>
       </form>
-      <p class="version">Spartain AI <span id="version"></span></p>
+      <p class="version">Spartan AI <span id="version"></span></p>
     </section>
 
   </div>

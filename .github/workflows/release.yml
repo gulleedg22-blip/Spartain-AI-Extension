@@ -1,0 +1,33 @@
+# On every push to main, package the extension and attach it to a GitHub
+# Release tagged with the manifest version. Re-pushing the same version
+# updates the existing release's asset.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run check
+      - name: Read version
+        id: v
+        run: echo "version=$(node -p "require('./manifest.json').version")" >> "$GITHUB_OUTPUT"
+      - run: npm run zip
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.v.outputs.version }}
+          name: v${{ steps.v.outputs.version }}
+          body: |
+            Spartan AI ${{ steps.v.outputs.version }}. Download the zip, unzip it, and load the folder with "Load unpacked" in chrome://extensions. If you run from a git clone instead, `git pull` and click Reload.
+          files: dist/spartan-ai.zip
