@@ -4,9 +4,9 @@
 
 **This is a Google Chrome browser extension, built on Manifest V3, whose UI lives in Chrome's side panel** (`chrome.sidePanel`). It is not a web app, not a React app, not a Node server. There is no build step: the files in this repo are loaded into Chrome as they are.
 
-**The AI behind it is a local model** running on the user's own machine. It is not the Anthropic API and not any hosted API. The only file that may talk to a model is `src/ai/provider.js`.
+**The AI behind it** is a local model (Ollama) by default, or the Anthropic API with a key each user enters in Settings. The only file that may talk to a model is `src/ai/provider.js`. Keys live in the user's `chrome.storage.local` and nowhere else.
 
-**Right now the repo is the UI framework only.** The working parts (model call, storage, page context) are stubs with documented contracts. Pick one from [docs/ROADMAP.md](docs/ROADMAP.md) or the open issues.
+Open work is in [docs/ROADMAP.md](docs/ROADMAP.md) and the issues.
 
 If you are using an AI assistant (Claude, ChatGPT, Copilot, Cursor, etc.) to work on this repo, **tell it this in your first message**:
 

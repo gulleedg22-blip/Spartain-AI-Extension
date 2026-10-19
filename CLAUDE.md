@@ -4,8 +4,8 @@ This repository is a **Chrome extension (Manifest V3) running as a side panel**.
 
 Quick facts:
 - No build step. No frameworks. Vanilla HTML/CSS/JS loaded straight from `src/`.
-- AI backend is a local model, reached only from `src/ai/provider.js`. Not the Anthropic API.
-- UI framework only today. Stubs with contracts: `src/ai/provider.js`, `src/sidepanel/storage.js`, `src/sidepanel/page-context.js`, `src/content/content.js`. Open work: `docs/ROADMAP.md`.
+- AI backend lives only in `src/ai/provider.js`: Ollama locally by default, or Anthropic with the user's own key from Settings (chrome.storage.local, never the repo).
+- Open work: `docs/ROADMAP.md`.
 - Colors only in `src/shared/theme.css`. Brand green `#076124`, white.
 - Message constants only in `src/shared/messages.js`.
 - Background = service worker (no DOM). Content script = classic script (no imports).

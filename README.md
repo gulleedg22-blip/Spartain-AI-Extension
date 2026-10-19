@@ -2,9 +2,7 @@
 
 A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Green and white, Spartan helmet logo.
 
-**Current state: UI framework only.** The layout, theme, tabs, and composer work. The AI provider, storage, and page-context pieces are stubs with documented contracts, left open for contributors. See [docs/ROADMAP.md](docs/ROADMAP.md).
-
-**AI backend: a local model** on the user's machine (not the Anthropic API, not a hosted API). The provider boundary is `src/ai/provider.js`.
+**Current state: working chat.** Two AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), or the **Anthropic API with your own key**, which is stored only in your browser and never in this repo. Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 > New here (human or AI)? Read [CONTRIBUTING.md](CONTRIBUTING.md) first. AI coding agents also read [AGENTS.md](AGENTS.md).
 
@@ -28,14 +26,14 @@ assets/
   logo-transparent.png        Logo with white keyed out (used in the panel)
   icons/icon-{16,32,48,128}.png
 src/
-  ai/provider.js                STUB: local model call (contract documented inside)
+  ai/provider.js                Model call: Ollama /api/chat or Anthropic Messages API
   background/service-worker.js  Opens the panel on toolbar click
-  content/content.js            STUB: page title / URL / selection reader
+  content/content.js            Page title / URL / selection reader (read-only)
   sidepanel/index.html          The side panel UI (Chat, Tools, Settings tabs)
   sidepanel/sidepanel.css       Layout styles
   sidepanel/sidepanel.js        Tabs, chat rendering, composer, settings form
-  sidepanel/storage.js          STUB: chrome.storage persistence
-  sidepanel/page-context.js     STUB: current-tab context
+  sidepanel/storage.js          chrome.storage persistence
+  sidepanel/page-context.js     Current-tab context
   shared/theme.css              Color and spacing tokens (brand green lives here)
   shared/messages.js            Message types + storage keys shared by all scripts
   data/bell-schedule.json       DLS bell schedule by day type (observed, inferred rows flagged)
@@ -70,11 +68,18 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 
 - [x] Side panel opens from toolbar and keyboard shortcut
 - [x] Chat / Tools / Settings layout, light and dark theme
-- [x] Local model settings fields (endpoint, model name) in the Settings tab
-- [ ] Local model provider (`src/ai/provider.js`)
-- [ ] Persistence (`src/sidepanel/storage.js`)
-- [ ] Page context (`src/sidepanel/page-context.js`, `src/content/content.js`)
+- [x] Local model provider via Ollama, or Anthropic API with the user's own key
+- [x] Settings and chat history persist in `chrome.storage.local`
+- [x] Page title, URL, and selected text sent with messages (toggle in Settings)
+- [ ] Streaming replies
+- [ ] Schedule view and profile editor (roadmap 5a, 5b)
 - [ ] Web Store listing assets
+
+## Using it
+
+1. Load unpacked (above), open the panel, go to **Settings**.
+2. **Local model**: install Ollama, run `ollama pull llama3`, leave Ollama running. Endpoint `http://localhost:11434`, model `llama3`. Save.
+3. **Anthropic**: pick "Anthropic API with my own key", paste your key, Save. The key lives in your browser profile only. Usage bills your key.
 
 ## Using Claude on GitHub
 
