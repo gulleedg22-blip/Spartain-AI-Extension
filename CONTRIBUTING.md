@@ -20,7 +20,7 @@ AI tools otherwise tend to assume a website or a Node project and will add frame
 2. **Colors live in `src/shared/theme.css`.** Do not hard-code hex values in other files. Brand green is `#076124`, white is `#ffffff`.
 3. **Message types live in `src/shared/messages.js`.** Add the constant there before using it anywhere.
 4. **Minimal permissions.** Every new entry in `manifest.json` `permissions` or `host_permissions` needs a one-line reason in the PR.
-5. **No secrets in the extension.** API keys must never be shipped in extension code; anyone can unzip it. The local model needs none. Model calls happen only in `src/ai/provider.js`.
+5. **No secrets anywhere in the repo.** API keys must never be shipped in extension code; anyone can unzip it. The local model needs none. Model calls happen only in `src/ai/provider.js`. `npm run check` fails if anything that looks like an API key is in a tracked file. If a key ever lands in a commit, it is burned: rotate it, do not just delete it.
 6. **Service worker is stateless.** Chrome kills it whenever it wants. Persist with `chrome.storage`, never with module-level variables.
 7. **Content script stays read-only and small.** It answers "what's on this page". It does not modify pages.
 8. **Run `npm run check` before pushing.** CI runs it too.

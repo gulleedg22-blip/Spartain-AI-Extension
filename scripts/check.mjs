@@ -49,4 +49,21 @@ for (const f of readdirSync('src/data').filter((n) => n.endsWith('.json'))) {
   catch (e) { fail(`invalid JSON in src/data/${f}: ${e.message}`); }
 }
 
+// 6. no API keys or tokens anywhere in tracked files
+const SECRET_PATTERNS = [
+  /sk-ant-[A-Za-z0-9_-]{8,}/,          // Anthropic keys
+  /sk-[A-Za-z0-9]{20,}/,               // generic sk- keys
+  /gh[pousr]_[A-Za-z0-9]{20,}/,        // GitHub tokens
+  /AIza[0-9A-Za-z_-]{30,}/,            // Google API keys
+];
+const tracked = execFileSync('git', ['ls-files', '-z'], { encoding: 'utf8' }).split('\0').filter(Boolean);
+for (const f of tracked) {
+  if (/\.(png|jpg|jpeg|webp|gif|ico|zip)$/i.test(f)) continue;
+  const text = readFileSync(f, 'utf8');
+  for (const re of SECRET_PATTERNS) {
+    if (re.test(text)) fail(`possible secret in ${f} (matches ${re}); remove it and rotate the key`);
+  }
+}
+ok('no secrets in tracked files');
+
 process.exit(failed ? 1 : 0);
