@@ -1,6 +1,6 @@
 # Instructions for AI coding agents
 
-You are working on **Spartain AI**, a **Google Chrome extension using Manifest V3 whose UI is a Chrome side panel**. Treat every statement below as a hard constraint.
+You are working on **Spartan AI**, a **Google Chrome extension using Manifest V3 whose UI is a Chrome side panel**. Treat every statement below as a hard constraint.
 
 ## What this is / is not
 
@@ -23,7 +23,9 @@ You are working on **Spartain AI**, a **Google Chrome extension using Manifest V
 | Reading the current web page | `src/content/content.js` + `src/sidepanel/page-context.js` |
 | Model call | `src/ai/provider.js` |
 | Persistence | `src/sidepanel/storage.js` |
-| Static data (bell schedule, example profile) | `src/data/*.json`. Never commit a real student's grades |
+| Static data (bell schedule, calendar, example profile) | `src/data/*.json`. Never commit a real student's grades |
+| Schedule logic | `src/tools/schedule.js` (pure functions; keep UI out) |
+| Update check | `src/update/check.js` |
 | Open work list | `docs/ROADMAP.md` |
 
 ## Rules
@@ -34,7 +36,7 @@ You are working on **Spartain AI**, a **Google Chrome extension using Manifest V
 4. Side panel and background scripts are ES modules and import from `src/shared/messages.js`.
 5. Add a message type to `MSG` in `messages.js` before sending it.
 6. Every new `permissions` / `host_permissions` entry must be justified in the PR description. Prefer `activeTab` over broad host permissions.
-7. Never embed API keys or tokens in code or files. The only key is the one a user types into Settings, and it stays in their `chrome.storage.local`. `host_permissions` is limited to localhost, api.anthropic.com, and *.workers.dev; justify any addition.
+7. Never embed API keys or tokens in code or files. The only key is the one a user types into Settings, and it stays in their `chrome.storage.local`. `host_permissions` is limited to localhost, api.anthropic.com, *.workers.dev, and raw.githubusercontent.com (update check); justify any addition.
 8. Chrome APIs return Promises in MV3; use `await`, not callbacks. Wrap `chrome.tabs.sendMessage` in try/catch (the receiver may not exist).
 9. Keep changes small and in scope. Do not refactor unrelated files.
 10. Before finishing: run `npm run check`. If you changed UI, describe how to verify it in `chrome://extensions` > Load unpacked.

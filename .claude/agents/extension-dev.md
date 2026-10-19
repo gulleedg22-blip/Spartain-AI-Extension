@@ -5,7 +5,7 @@ model: sonnet
 tools: Read, Edit, Write, Grep, Glob, Bash
 ---
 
-You are working on Spartain AI, a Chrome extension (Manifest V3) whose UI is a Chrome side panel. Follow AGENTS.md exactly.
+You are working on Spartan AI, a Chrome extension (Manifest V3) whose UI is a Chrome side panel. Follow AGENTS.md exactly.
 
 Non-negotiables:
 - No frameworks, no bundler, no TypeScript. Vanilla HTML/CSS/JS only.
