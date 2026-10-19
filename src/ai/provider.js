@@ -6,6 +6,8 @@
 //   'anthropic' the Anthropic API with a key the user typed into Settings.
 //               The key lives in chrome.storage.local on that computer only.
 //               It is never in the repo and never sent anywhere but Anthropic.
+//   'proxy'     a team proxy (see proxy/README.md) that holds the key server
+//               side. The user enters the proxy URL and a passcode.
 //
 // Contract: generate({ messages, context, settings, signal }) -> Promise<string>
 //   messages : [{ role: 'user' | 'ai', text }]  full conversation
@@ -22,7 +24,8 @@ export class ProviderNotConfiguredError extends Error {
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
-const ANTHROPIC_MODEL = 'claude-sonnet-5-5';
+const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-5-5';
+const ANTHROPIC_MODELS = new Set(['claude-sonnet-5-5', 'claude-haiku-4-5', 'claude-opus-5-5']);
 const MAX_TOKENS = 1024;
 
 function systemPrompt(context, settings) {
@@ -75,7 +78,47 @@ async function generateLocal({ messages, context, settings, signal }) {
   return text.trim();
 }
 
-async function generateAnthropic({ messages, context, settings, signal }) {
+function anthropicBody({ messages, context, settings }) {
+  const model = ANTHROPIC_MODELS.has(settings.anthropicModel) ? settings.anthropicModel : DEFAULT_ANTHROPIC_MODEL;
+  return JSON.stringify({
+    model,
+    max_tokens: MAX_TOKENS,
+    fallbacks: 'default',
+    system: systemPrompt(context, settings),
+    messages: toTurns(messages),
+  });
+}
+
+async function readAnthropicResponse(res, label) {
+  if (!res.ok) {
+    let detail = '';
+    try { detail = (await res.json())?.error?.message ?? ''; } catch { /* ignore */ }
+    if (res.status === 401) throw new Error(label === 'proxy' ? 'The proxy rejected the passcode. Check it in Settings.' : 'Anthropic rejected the API key. Check it in Settings.');
+    throw new Error(`${label === 'proxy' ? 'Proxy' : 'Anthropic API'} returned ${res.status}${detail ? `: ${detail}` : ''}`);
+  }
+  const data = await res.json();
+  if (data.stop_reason === 'refusal') return 'The model declined to answer that request.';
+  const text = (data.content ?? []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+  if (!text) throw new Error('The model returned no text.');
+  return text.trim();
+}
+
+async function generateProxy(args) {
+  const { settings, signal } = args;
+  const url = (settings.proxyUrl || '').trim().replace(/\/+$/, '');
+  if (!url) throw new ProviderNotConfiguredError('Enter the team proxy URL in Settings.');
+  if (!settings.proxyPasscode) throw new ProviderNotConfiguredError('Enter the team passcode in Settings.');
+  const res = await fetch(url, {
+    method: 'POST',
+    signal,
+    headers: { 'content-type': 'application/json', 'x-spartain-passcode': settings.proxyPasscode },
+    body: anthropicBody(args),
+  }).catch((e) => { throw new Error(`Could not reach the proxy at ${url} (${e.message}).`); });
+  return readAnthropicResponse(res, 'proxy');
+}
+
+async function generateAnthropic(args) {
+  const { settings, signal } = args;
   const key = settings.anthropicApiKey?.trim();
   if (!key) throw new ProviderNotConfiguredError('Enter your Anthropic API key in Settings.');
 
@@ -91,36 +134,17 @@ async function generateAnthropic({ messages, context, settings, signal }) {
       // Route refusals from safety classifiers to a fallback model automatically.
       'anthropic-beta': 'server-side-fallback-2026-07-01',
     },
-    body: JSON.stringify({
-      model: ANTHROPIC_MODEL,
-      max_tokens: MAX_TOKENS,
-      fallbacks: 'default',
-      system: systemPrompt(context, settings),
-      messages: toTurns(messages),
-    }),
+    body: anthropicBody(args),
   }).catch((e) => {
     throw new Error(`Could not reach the Anthropic API (${e.message}).`);
   });
-
-  if (!res.ok) {
-    let detail = '';
-    try { detail = (await res.json())?.error?.message ?? ''; } catch { /* ignore */ }
-    if (res.status === 401) throw new Error('Anthropic rejected the API key. Check it in Settings.');
-    throw new Error(`Anthropic API returned ${res.status}${detail ? `: ${detail}` : ''}`);
-  }
-
-  const data = await res.json();
-  if (data.stop_reason === 'refusal') {
-    return 'The model declined to answer that request.';
-  }
-  const text = (data.content ?? []).filter((b) => b.type === 'text').map((b) => b.text).join('');
-  if (!text) throw new Error('Anthropic returned no text.');
-  return text.trim();
+  return readAnthropicResponse(res, 'anthropic');
 }
 
 export async function generate(args) {
   const provider = args.settings?.provider ?? 'local';
   if (provider === 'anthropic') return generateAnthropic(args);
+  if (provider === 'proxy') return generateProxy(args);
   if (provider === 'local') return generateLocal(args);
   throw new ProviderNotConfiguredError(`Unknown provider "${provider}".`);
 }
