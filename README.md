@@ -2,7 +2,7 @@
 
 A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Green and white, Spartan helmet logo.
 
-**Current state: working chat.** Two AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), or the **Anthropic API with your own key**, which is stored only in your browser and never in this repo. Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Current state: working chat.** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 > New here (human or AI)? Read [CONTRIBUTING.md](CONTRIBUTING.md) first. AI coding agents also read [AGENTS.md](AGENTS.md).
 
@@ -38,7 +38,8 @@ src/
   shared/messages.js            Message types + storage keys shared by all scripts
   data/bell-schedule.json       DLS bell schedule by day type (observed, inferred rows flagged)
   data/profile.example.json     Example student profile shape with made-up grades
-docs/ROADMAP.md               Open work, one row per stub
+proxy/                        Optional Cloudflare Worker that holds a shared key behind a passcode
+docs/ROADMAP.md               Open work
 .claude/                      Claude Code config and agents (Sonnet)
 .github/workflows/            CI + Claude GitHub Action
 ```
@@ -80,6 +81,7 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 1. Load unpacked (above), open the panel, go to **Settings**.
 2. **Local model**: install Ollama, run `ollama pull llama3`, leave Ollama running. Endpoint `http://localhost:11434`, model `llama3`. Save.
 3. **Anthropic**: pick "Anthropic API with my own key", paste your key, Save. The key lives in your browser profile only. Usage bills your key.
+4. **Team proxy**: the owner deploys `proxy/` once (5 minutes, free), then shares a URL and passcode. Pick "Team proxy with a passcode", enter both, Save. Nobody but the owner ever sees the key.
 
 ## Using Claude on GitHub
 

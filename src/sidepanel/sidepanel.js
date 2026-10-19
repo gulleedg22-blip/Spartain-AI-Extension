@@ -67,6 +67,8 @@ function fillSettingsForm() {
   f.modelEndpoint.value = settings.modelEndpoint;
   f.modelName.value = settings.modelName;
   f.anthropicApiKey.value = settings.anthropicApiKey ?? '';
+  f.proxyUrl.value = settings.proxyUrl ?? '';
+  f.proxyPasscode.value = settings.proxyPasscode ?? '';
   showProviderFields(f.provider.value);
 }
 function showProviderFields(provider) {
@@ -87,6 +89,8 @@ els.settingsForm.addEventListener('submit', async (e) => {
     modelEndpoint: f.modelEndpoint.value.trim(),
     modelName: f.modelName.value.trim(),
     anthropicApiKey: f.anthropicApiKey.value.trim(),
+    proxyUrl: f.proxyUrl.value.trim(),
+    proxyPasscode: f.proxyPasscode.value.trim(),
   };
   await saveSettings(settings);
   applyTheme();

@@ -22,8 +22,10 @@ export const DEFAULT_SETTINGS = Object.freeze({
   theme: 'system',        // 'system' | 'light' | 'dark'
   includePageContext: true,
   displayName: '',
-  provider: 'local',      // 'local' (Ollama on this machine) | 'anthropic' (user's own key)
+  provider: 'local',      // 'local' (Ollama) | 'anthropic' (user's own key) | 'proxy' (team proxy + passcode)
   modelEndpoint: 'http://localhost:11434',
   modelName: 'llama3',
   anthropicApiKey: '',    // stored only in chrome.storage.local on this computer
+  proxyUrl: '',           // e.g. https://spartain-proxy.yourname.workers.dev
+  proxyPasscode: '',
 });

@@ -95,6 +95,7 @@
           <select name="provider">
             <option value="local">Local model on this computer (Ollama)</option>
             <option value="anthropic">Anthropic API with my own key</option>
+            <option value="proxy">Team proxy with a passcode</option>
           </select>
         </label>
         <div data-provider-fields="local">
@@ -107,6 +108,17 @@
             <input type="text" name="modelName" placeholder="e.g. llama3" />
           </label>
           <p class="hint">Install Ollama, run <code>ollama pull llama3</code>, and keep it running. Nothing leaves your computer.</p>
+        </div>
+        <div data-provider-fields="proxy" hidden>
+          <label class="field">
+            <span>Proxy URL</span>
+            <input type="url" name="proxyUrl" placeholder="https://spartain-proxy.example.workers.dev" />
+          </label>
+          <label class="field">
+            <span>Passcode</span>
+            <input type="password" name="proxyPasscode" autocomplete="off" />
+          </label>
+          <p class="hint">The key stays on the proxy. Ask the owner for the URL and passcode. See <code>proxy/README.md</code>.</p>
         </div>
         <div data-provider-fields="anthropic" hidden>
           <label class="field">
