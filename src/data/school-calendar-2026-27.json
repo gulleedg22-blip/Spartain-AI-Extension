@@ -1,6 +1,8 @@
 {
-  "$comment": "De La Salle High School 2026-27 calendar framework (updated 5/12/2026) plus observed day types for October 2026. Source: CalendarFramework_26-27.pdf and the dlshs.org calendar printout.",
+  "$comment": "De La Salle High School 2026-27 calendar framework (updated 5/12/2026). dayTypesObserved is copied from the school's published calendar. dayTypesProjected (if present) comes from a student's own calendar and is not official. Sources: docs/source/*.pdf.",
   "schoolYear": "2026-2027",
+  "firstDay": "2026-08-14",
+  "lastDay": "2027-05-27",
   "semesters": {
     "s1": {
       "firstDay": "2026-08-14",
@@ -23,14 +25,6 @@
     }
   },
   "noClasses": [
-    {
-      "date": "2026-08-10",
-      "label": "Faculty/Staff Professional Days"
-    },
-    {
-      "date": "2026-08-11",
-      "label": "Faculty/Staff Professional Days"
-    },
     {
       "date": "2026-09-04",
       "label": "Faculty/Staff Retreat"
@@ -57,23 +51,14 @@
     },
     {
       "date": "2026-11-23",
-      "label": "Thanksgiving Week",
-      "through": "2026-11-27"
+      "through": "2026-11-27",
+      "label": "Thanksgiving Week"
     },
     {
       "date": "2026-12-21",
-      "label": "Christmas Break begins"
-    },
-    {
-      "date": "2027-01-05",
-      "label": "New Faculty/Staff Orientations",
-      "through": "2027-01-07",
-      "note": "no classes for students"
-    },
-    {
-      "date": "2027-01-07",
-      "label": "Faculty Professional Days",
-      "through": "2027-01-08"
+      "through": "2027-01-08",
+      "label": "Christmas Break",
+      "note": "Semester 2 begins 2027-01-11. Dec 21 is a faculty grading day; Jan 7-8 are faculty professional days."
     },
     {
       "date": "2027-01-18",
@@ -93,39 +78,84 @@
     },
     {
       "date": "2027-03-24",
-      "label": "Easter Break begins",
-      "classesResume": "2027-04-05"
+      "through": "2027-04-02",
+      "label": "Easter Break",
+      "note": "Classes resume 2027-04-05."
     },
     {
       "date": "2027-04-23",
       "label": "Faculty/Staff Professional Day"
+    }
+  ],
+  "finals": [
+    {
+      "date": "2026-12-15",
+      "through": "2026-12-18",
+      "label": "Semester 1 final exams"
     },
     {
-      "date": "2027-05-28",
-      "label": "Faculty/Staff Professional Day"
+      "date": "2027-05-24",
+      "through": "2027-05-27",
+      "label": "Semester 2 final exams"
     }
   ],
   "specialDays": [
     {
       "date": "2026-08-12",
-      "label": "Freshman & Transfer Orientation"
+      "label": "Freshman & Transfer Student Orientation"
     },
     {
       "date": "2026-08-13",
       "label": "Sophomore, Junior & Senior Orientation"
     },
     {
+      "date": "2026-08-14",
+      "label": "First day of classes"
+    },
+    {
+      "date": "2026-08-16",
+      "label": "New Student/Parent Welcome Liturgy, BBQ"
+    },
+    {
       "date": "2026-09-03",
-      "label": "Back-to-School Night"
+      "label": "Back-to-School Night for Parents"
+    },
+    {
+      "date": "2026-10-02",
+      "label": "First quarter ends"
     },
     {
       "date": "2026-10-14",
-      "label": "10th & 11th Grade Testing Day; Freshman Retreat; Senior College Application Workshop"
+      "label": "Special testing day for students; Freshman Retreat"
+    },
+    {
+      "date": "2026-11-30",
+      "label": "Classes resume after Thanksgiving"
+    },
+    {
+      "date": "2026-12-18",
+      "label": "Semester 1 ends"
+    },
+    {
+      "date": "2027-01-11",
+      "label": "Second semester begins"
+    },
+    {
+      "date": "2027-03-05",
+      "label": "Quarter 3 ends"
+    },
+    {
+      "date": "2027-04-05",
+      "label": "Classes resume after Easter Break"
     },
     {
       "date": "2027-05-03",
-      "label": "AP Testing begins",
-      "through": "2027-05-14"
+      "through": "2027-05-14",
+      "label": "AP testing"
+    },
+    {
+      "date": "2027-05-12",
+      "label": "Last day for seniors"
     },
     {
       "date": "2027-05-14",
@@ -133,11 +163,19 @@
     },
     {
       "date": "2027-05-16",
-      "label": "Graduation, Class of 2027"
+      "label": "Graduation for the Class of 2027"
+    },
+    {
+      "date": "2027-05-27",
+      "label": "Semester 2 ends"
+    },
+    {
+      "date": "2027-05-28",
+      "label": "Faculty/Staff Professional Day (after the last day of classes)"
     }
   ],
   "dayTypesObserved": {
-    "$comment": "October 2026 from the school calendar. Weekday pattern: Mon 0-7, Tue A, Wed B (often a variant), Thu A, Fri B.",
+    "$comment": "September 28 to October 30, 2026, from the school's calendar (docs/source/DLS-Calendar-October-2026.pdf).",
     "2026-09-28": "0-7",
     "2026-09-29": "A-Day",
     "2026-09-30": "B-Day Academic Time",
@@ -163,5 +201,107 @@
     "2026-10-28": "B-Day Academic Time",
     "2026-10-29": "A-Day",
     "2026-10-30": "B-Day"
+  },
+  "dayTypesProjected": {
+    "$comment": "November 2, 2026 to May 12, 2027, from a student's own calendar (entered August 2026, last revised October 30, 2026). NOT official. Checked against the school's published calendar for the 22 class days from September 28 to October 30, 2026: 22 of 22 matched. Replace with the school's calendar as each month is published. No entries after May 12, 2027 (seniors' last day); later dates fall back to the weekday pattern.",
+    "2026-11-02": "A-Day",
+    "2026-11-03": "B-Day Late Start",
+    "2026-11-04": "A-Day",
+    "2026-11-05": "B-Day",
+    "2026-11-10": "A-Day",
+    "2026-11-11": "B-Day Late Start",
+    "2026-11-12": "A-Day",
+    "2026-11-13": "B-Day",
+    "2026-11-16": "0-7",
+    "2026-11-17": "A-Day",
+    "2026-11-18": "B-Day Mass",
+    "2026-11-19": "A-Day",
+    "2026-11-20": "B-Day",
+    "2026-11-30": "0-7",
+    "2026-12-01": "A-Day",
+    "2026-12-02": "B-Day Academic Time",
+    "2026-12-03": "A-Day",
+    "2026-12-04": "B-Day",
+    "2026-12-07": "A-Day",
+    "2026-12-08": "B-Day Mass",
+    "2026-12-09": "A-Day",
+    "2026-12-10": "B-Day Academic Time",
+    "2026-12-11": "0-7",
+    "2026-12-14": "0-7",
+    "2027-01-11": "0-7",
+    "2027-01-12": "A-Day",
+    "2027-01-13": "B-Day Late Start",
+    "2027-01-14": "A-Day",
+    "2027-01-15": "B-Day",
+    "2027-01-19": "A-Day",
+    "2027-01-20": "B-Day Late Start",
+    "2027-01-21": "A-Day",
+    "2027-01-22": "B-Day",
+    "2027-01-25": "0-7",
+    "2027-01-26": "A-Day",
+    "2027-01-27": "B-Day",
+    "2027-01-28": "A-Day",
+    "2027-01-29": "B-Day",
+    "2027-02-01": "0-7",
+    "2027-02-02": "B-Day Late Start",
+    "2027-02-03": "A-Day",
+    "2027-02-04": "B-Day",
+    "2027-02-05": "A-Day",
+    "2027-02-08": "B-Day Late Start",
+    "2027-02-09": "A-Day",
+    "2027-02-10": "B-Day Mass",
+    "2027-02-11": "A-Day",
+    "2027-02-16": "B-Day Late Start",
+    "2027-02-17": "A-Day",
+    "2027-02-18": "B-Day",
+    "2027-02-19": "A-Day",
+    "2027-02-22": "0-7",
+    "2027-02-23": "A-Day",
+    "2027-02-24": "B-Day",
+    "2027-02-25": "A-Day",
+    "2027-02-26": "B-Day",
+    "2027-03-01": "0-7",
+    "2027-03-02": "A-Day",
+    "2027-03-03": "B-Day Assembly",
+    "2027-03-04": "A-Day",
+    "2027-03-05": "B-Day",
+    "2027-03-08": "A-Day",
+    "2027-03-09": "B-Day Late Start",
+    "2027-03-10": "A-Day",
+    "2027-03-11": "B-Day Mass",
+    "2027-03-15": "0-7",
+    "2027-03-16": "A-Day",
+    "2027-03-17": "B-Day",
+    "2027-03-18": "A-Day",
+    "2027-03-19": "B-Day",
+    "2027-03-22": "A-Day",
+    "2027-03-23": "B-Day Mass",
+    "2027-04-05": "0-7",
+    "2027-04-06": "A-Day",
+    "2027-04-07": "B-Day",
+    "2027-04-08": "A-Day",
+    "2027-04-09": "B-Day",
+    "2027-04-12": "0-7",
+    "2027-04-13": "A-Day",
+    "2027-04-14": "B-Day Late Start",
+    "2027-04-15": "A-Day",
+    "2027-04-16": "B-Day Rally",
+    "2027-04-19": "A-Day",
+    "2027-04-20": "B-Day Late Start",
+    "2027-04-21": "A-Day",
+    "2027-04-22": "B-Day",
+    "2027-04-26": "0-7",
+    "2027-04-27": "A-Day",
+    "2027-04-28": "B-Day Mass",
+    "2027-04-29": "A-Day",
+    "2027-04-30": "B-Day Assembly",
+    "2027-05-03": "0-7",
+    "2027-05-04": "A-Day",
+    "2027-05-05": "B-Day",
+    "2027-05-06": "A-Day",
+    "2027-05-07": "B-Day",
+    "2027-05-10": "0-7",
+    "2027-05-11": "A-Day",
+    "2027-05-12": "B-Day"
   }
 }

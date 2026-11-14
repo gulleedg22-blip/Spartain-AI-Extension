@@ -22,6 +22,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   theme: 'system',        // 'system' | 'light' | 'dark'
   includePageContext: true,
   checkForUpdates: true,
+  showZeroPeriod: false,  // show 0 period (7:15) in the schedule
   displayName: '',
   provider: 'local',      // 'local' (Ollama) | 'anthropic' (user's own key) | 'proxy' (team proxy + passcode)
   modelEndpoint: 'http://localhost:11434',

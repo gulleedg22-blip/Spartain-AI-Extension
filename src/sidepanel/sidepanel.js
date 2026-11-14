@@ -1,28 +1,41 @@
 // Side panel UI. Vanilla JS, no build step.
-// This file owns UI behaviour: tabs, rendering messages, the composer, theme,
-// and the settings form. Real work lives behind three modules:
-//   src/ai/provider.js            -> the model call (local Ollama or user's own Anthropic key)
+// This file owns UI behaviour: tabs, chat, now bar, schedule, settings.
+// Real work lives behind these modules:
+//   src/ai/provider.js            -> the model call
 //   src/sidepanel/storage.js      -> chrome.storage persistence
 //   src/sidepanel/page-context.js -> what is on the current tab
+//   src/sidepanel/markdown.js     -> safe Markdown -> DOM (never innerHTML)
+//   src/tools/schedule.js         -> schedule snapshot
+//   src/update/check.js           -> update check
 
 import { MSG, DEFAULT_SETTINGS } from '../shared/messages.js';
 import { generate, ProviderNotConfiguredError } from '../ai/provider.js';
 import { loadSettings, saveSettings, loadHistory, saveHistory, clearHistory } from './storage.js';
 import { getPageContext } from './page-context.js';
-import { loadScheduleData, dayTypeFor, whereInDay, fmt } from '../tools/schedule.js';
+import { loadScheduleData, scheduleSnapshot, fmt } from '../tools/schedule.js';
 import { checkForUpdate, reloadExtension } from '../update/check.js';
+import { renderMarkdown } from './markdown.js';
 
 const $ = (sel) => document.querySelector(sel);
 const els = {
-  tabs: document.querySelectorAll('.tab'),
+  tabs: [...document.querySelectorAll('.tab')],
   panels: document.querySelectorAll('.panel'),
   messages: $('#messages'),
   empty: $('#empty-state'),
+  emptyChips: $('#empty-chips'),
+  emptySetup: $('#empty-setup'),
+  chatToolbar: $('#chat-toolbar'),
+  newChat: $('#new-chat'),
   composer: $('#composer'),
   input: $('#input'),
   send: $('#send'),
-  status: $('#status'),
-  pageTitle: $('#page-title'),
+  stop: $('#stop'),
+  contextChip: $('#context-chip'),
+  providerChip: $('#provider-chip'),
+  nowbar: $('#nowbar'),
+  nowbarMain: $('#nowbar-main'),
+  nowbarSide: $('#nowbar-side'),
+  nowbarFill: $('#nowbar-fill'),
   ctxTitle: $('#ctx-title'),
   ctxUrl: $('#ctx-url'),
   ctxSelection: $('#ctx-selection'),
@@ -30,141 +43,280 @@ const els = {
   settingsForm: $('#settings-form'),
   settingsStatus: $('#settings-status'),
   clearHistory: $('#clear-history'),
+  testConnection: $('#test-connection'),
+  testStatus: $('#test-status'),
   version: $('#version'),
+  updateStatus: $('#update-status'),
+  checkNow: $('#check-now'),
+  releasesLink: $('#releases-link'),
+  scheduleCard: $('#schedule-card'),
   scheduleDay: $('#schedule-day'),
+  scheduleNote: $('#schedule-note'),
   scheduleNow: $('#schedule-now'),
   scheduleBlocks: $('#schedule-blocks'),
   updateBanner: $('#update-banner'),
   updateText: $('#update-text'),
   updateReload: $('#update-reload'),
 };
+const form = els.settingsForm.elements;
 
 let settings = { ...DEFAULT_SETTINGS };
 let history = [];
+let pending = null; // { controller, bubble, userStopped } while a reply is in flight
 
 /* ---------- Tabs ---------- */
-els.tabs.forEach((tab) => {
-  tab.addEventListener('click', () => {
-    els.tabs.forEach((t) => {
-      const on = t === tab;
-      t.classList.toggle('is-active', on);
-      t.setAttribute('aria-selected', String(on));
-    });
-    els.panels.forEach((p) => {
-      const on = p.dataset.panel === tab.dataset.tab;
-      p.classList.toggle('is-active', on);
-      p.hidden = !on;
-    });
-    if (tab.dataset.tab === 'tools') { refreshContext(); renderSchedule(); }
+function activateTab(name, { focus = false } = {}) {
+  els.tabs.forEach((t) => {
+    const on = t.dataset.tab === name;
+    t.classList.toggle('is-active', on);
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+    if (on && focus) t.focus();
+  });
+  els.panels.forEach((p) => {
+    const on = p.dataset.panel === name;
+    p.classList.toggle('is-active', on);
+    p.hidden = !on;
+  });
+  if (name === 'tools') { refreshContext(); renderSchedule(); }
+}
+els.tabs.forEach((tab, i) => {
+  tab.addEventListener('click', () => activateTab(tab.dataset.tab));
+  tab.addEventListener('keydown', (e) => {
+    const last = els.tabs.length - 1;
+    const to = { ArrowRight: i === last ? 0 : i + 1, ArrowLeft: i === 0 ? last : i - 1, Home: 0, End: last }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    activateTab(els.tabs[to].dataset.tab, { focus: true });
   });
 });
 
+/* ---------- Provider status ---------- */
+const CLAUDE_NAMES = { 'claude-sonnet-5-5': 'Claude Sonnet 5.5', 'claude-haiku-4-5': 'Claude Haiku 4.5', 'claude-opus-5-5': 'Claude Opus 5.5' };
+function providerState(s) {
+  if (s.provider === 'anthropic') {
+    return { ok: !!s.anthropicApiKey?.trim(), label: CLAUDE_NAMES[s.anthropicModel] ?? 'Claude' };
+  }
+  if (s.provider === 'proxy') return { ok: !!(s.proxyUrl?.trim() && s.proxyPasscode?.trim()), label: 'Team proxy' };
+  return { ok: !!(s.modelEndpoint?.trim() && s.modelName?.trim()), label: `Local · ${s.modelName?.trim() ?? ''}` };
+}
+function renderProviderChip() {
+  const st = providerState(settings);
+  els.providerChip.textContent = st.ok ? st.label : 'Set up AI';
+  els.providerChip.title = st.ok ? 'AI provider. Click to change it in Settings.' : 'No AI provider is set up yet';
+  els.emptyChips.hidden = !st.ok;
+  els.emptySetup.hidden = st.ok;
+}
+function openProviderSettings() {
+  activateTab('settings', { focus: false });
+  form.provider.focus();
+}
+els.providerChip.addEventListener('click', openProviderSettings);
+els.emptySetup.addEventListener('click', openProviderSettings);
+
 /* ---------- Theme ---------- */
-function applyTheme() {
-  if (settings.theme === 'system') delete document.documentElement.dataset.theme;
-  else document.documentElement.dataset.theme = settings.theme;
+function applyTheme(theme = settings.theme) {
+  if (theme === 'system') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
 }
 
 /* ---------- Settings form ---------- */
 function fillSettingsForm() {
-  const f = els.settingsForm.elements;
-  f.displayName.value = settings.displayName;
-  f.theme.value = settings.theme;
-  f.includePageContext.checked = settings.includePageContext;
-  f.checkForUpdates.checked = settings.checkForUpdates !== false;
-  f.provider.value = settings.provider;
-  f.modelEndpoint.value = settings.modelEndpoint;
-  f.modelName.value = settings.modelName;
-  f.anthropicApiKey.value = settings.anthropicApiKey ?? '';
-  f.anthropicModel.value = settings.anthropicModel ?? 'claude-sonnet-5-5';
-  f.proxyUrl.value = settings.proxyUrl ?? '';
-  f.proxyPasscode.value = settings.proxyPasscode ?? '';
-  showProviderFields(f.provider.value);
+  form.displayName.value = settings.displayName ?? '';
+  form.theme.value = settings.theme;
+  form.includePageContext.checked = !!settings.includePageContext;
+  form.showZeroPeriod.checked = !!settings.showZeroPeriod;
+  form.checkForUpdates.checked = settings.checkForUpdates !== false;
+  form.provider.value = settings.provider;
+  form.modelEndpoint.value = settings.modelEndpoint ?? '';
+  form.modelName.value = settings.modelName ?? '';
+  form.anthropicApiKey.value = settings.anthropicApiKey ?? '';
+  form.anthropicModel.value = settings.anthropicModel ?? 'claude-sonnet-5-5';
+  form.proxyUrl.value = settings.proxyUrl ?? '';
+  form.proxyPasscode.value = settings.proxyPasscode ?? '';
+  showProviderFields(form.provider.value);
+}
+function readForm() {
+  return {
+    ...settings,
+    displayName: form.displayName.value.trim(),
+    theme: form.theme.value,
+    includePageContext: form.includePageContext.checked,
+    showZeroPeriod: form.showZeroPeriod.checked,
+    checkForUpdates: form.checkForUpdates.checked,
+    provider: form.provider.value,
+    modelEndpoint: form.modelEndpoint.value.trim(),
+    modelName: form.modelName.value.trim(),
+    anthropicApiKey: form.anthropicApiKey.value.trim(),
+    anthropicModel: form.anthropicModel.value,
+    proxyUrl: form.proxyUrl.value.trim(),
+    proxyPasscode: form.proxyPasscode.value.trim(),
+  };
 }
 function showProviderFields(provider) {
   els.settingsForm.querySelectorAll('[data-provider-fields]').forEach((el) => {
     el.hidden = !el.dataset.providerFields.split(/\s+/).includes(provider);
   });
 }
-els.settingsForm.elements.provider.addEventListener('change', (e) => showProviderFields(e.target.value));
+form.provider.addEventListener('change', (e) => { showProviderFields(e.target.value); els.testStatus.textContent = ''; });
+form.theme.addEventListener('change', () => applyTheme(form.theme.value)); // preview; persisted on Save
+
+let flashTimer;
+function flash(text) {
+  els.settingsStatus.textContent = text;
+  els.settingsStatus.classList.add('is-ok');
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => { els.settingsStatus.textContent = ''; els.settingsStatus.classList.remove('is-ok'); }, 2500);
+}
 els.settingsForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const f = els.settingsForm.elements;
-  settings = {
-    ...settings,
-    displayName: f.displayName.value.trim(),
-    theme: f.theme.value,
-    includePageContext: f.includePageContext.checked,
-    checkForUpdates: f.checkForUpdates.checked,
-    provider: f.provider.value,
-    modelEndpoint: f.modelEndpoint.value.trim(),
-    modelName: f.modelName.value.trim(),
-    anthropicApiKey: f.anthropicApiKey.value.trim(),
-    anthropicModel: f.anthropicModel.value,
-    proxyUrl: f.proxyUrl.value.trim(),
-    proxyPasscode: f.proxyPasscode.value.trim(),
-  };
+  settings = readForm();
   await saveSettings(settings);
   applyTheme();
+  renderProviderChip();
+  renderNowbar();
+  renderSchedule();
+  refreshContext();
   flash('Saved.');
 });
-els.clearHistory.addEventListener('click', async () => {
+
+els.testConnection.addEventListener('click', async () => {
+  const trial = readForm();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30000);
+  const started = performance.now();
+  els.testConnection.disabled = true;
+  els.testStatus.className = 'test-status';
+  els.testStatus.textContent = 'Testing…';
+  try {
+    await generate({ messages: [{ role: 'user', text: 'Reply with the single word OK.', at: Date.now() }], context: null, settings: trial, signal: controller.signal });
+    els.testStatus.textContent = `Connected. Replied in ${((performance.now() - started) / 1000).toFixed(1)} s.`;
+    els.testStatus.classList.add('is-ok');
+  } catch (err) {
+    els.testStatus.textContent = err?.name === 'AbortError' ? 'Timed out after 30 s.' : (err?.message ?? String(err));
+    els.testStatus.classList.add('is-bad');
+  } finally {
+    clearTimeout(timer);
+    els.testConnection.disabled = false;
+  }
+});
+
+// Two-step confirm button: first click arms for 3 s, second click runs the action.
+function twoStep(btn, armedLabel, action) {
+  const label = btn.textContent;
+  let timer = null;
+  const reset = () => { clearTimeout(timer); timer = null; btn.textContent = label; };
+  btn.addEventListener('click', async () => {
+    if (timer) { reset(); await action(); return; }
+    btn.textContent = armedLabel;
+    timer = setTimeout(reset, 3000);
+  });
+}
+async function wipeChat() {
+  pending?.controller.abort();
   history = [];
   await clearHistory();
   els.messages.querySelectorAll('.msg').forEach((n) => n.remove());
-  els.empty.hidden = false;
-});
-function flash(text) {
-  els.settingsStatus.textContent = text;
-  setTimeout(() => (els.settingsStatus.textContent = ''), 2500);
+  updateChatState();
 }
+twoStep(els.clearHistory, 'Clear all? Click again', wipeChat);
+twoStep(els.newChat, 'Clear chat? Click again', wipeChat);
 
-/* ---------- Page context (Tools tab + header subtitle) ---------- */
+/* ---------- Page context ---------- */
 async function refreshContext() {
   const ctx = await getPageContext();
-  els.pageTitle.textContent = ctx.title || ctx.url || 'No page context';
   els.ctxTitle.textContent = ctx.title || '—';
   els.ctxUrl.textContent = ctx.url || '—';
   els.ctxSelection.textContent = ctx.selection || '—';
+  const title = ctx.title || ctx.url || 'this page';
+  const sel = ctx.selection?.length;
+  els.contextChip.textContent = !settings.includePageContext ? 'Page not included'
+    : sel ? `Selection (${sel} chars) · ${title}` : `Page: ${title}`;
+  els.contextChip.setAttribute('aria-pressed', String(!!settings.includePageContext));
+  els.contextChip.title = els.contextChip.textContent;
   return ctx;
 }
 els.refreshContext.addEventListener('click', refreshContext);
+els.contextChip.addEventListener('click', async () => {
+  settings = { ...settings, includePageContext: !settings.includePageContext };
+  form.includePageContext.checked = settings.includePageContext;
+  await saveSettings(settings);
+  refreshContext();
+});
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === MSG.TAB_CHANGED) refreshContext();
 });
+window.addEventListener('focus', refreshContext);
 
-/* ---------- Schedule tool ---------- */
+/* ---------- Schedule: now bar + Tools card ---------- */
 let scheduleData = null;
+let scheduleFailed = false;
+async function getSnapshot() {
+  if (!scheduleData && !scheduleFailed) {
+    try { scheduleData = await loadScheduleData(); } catch { scheduleFailed = true; }
+  }
+  if (!scheduleData) return null;
+  return scheduleSnapshot(new Date(), scheduleData, { zeroPeriod: !!settings.showZeroPeriod });
+}
+function statusText(s) {
+  const up = s.upcoming;
+  switch (s.state) {
+    case 'in-block':
+      return { main: `${s.current.name} · ${s.minutesLeft} min left`, side: s.next ? `Next: ${s.next.name} ${fmt(s.next.start)}` : 'Last block' };
+    case 'between':
+      return { main: 'Passing period', side: `${s.next.name} at ${fmt(s.next.start)} · in ${s.minutesUntilNext} min` };
+    case 'before':
+      return { main: s.day.type, side: `${s.next.name} at ${fmt(s.next.start)}` };
+    case 'after':
+      return { main: 'School day is over', side: up ? `${up.dateLabel}: ${up.day.type}` : '' };
+    default:
+      return { main: s.day.label, side: up ? `Next: ${up.dateLabel} · ${up.day.type}` : '' };
+  }
+}
+async function renderNowbar() {
+  const s = await getSnapshot();
+  if (!s) { els.nowbar.hidden = true; return; }
+  const t = statusText(s);
+  els.nowbar.hidden = false;
+  els.nowbarMain.textContent = t.main;
+  els.nowbarSide.textContent = t.side;
+  els.nowbarFill.style.width = `${Math.round((s.progress ?? 0) * 100)}%`;
+  els.nowbar.setAttribute('aria-label', `${t.main}${t.side ? '. ' + t.side : ''}. Open schedule.`);
+}
 async function renderSchedule() {
-  try {
-    scheduleData ??= await loadScheduleData();
-  } catch (e) {
-    els.scheduleDay.textContent = `Could not load schedule data (${e.message}).`;
+  const s = await getSnapshot();
+  if (!s) { els.scheduleDay.textContent = 'Could not load schedule data.'; return; }
+  const { day } = s;
+  els.scheduleDay.textContent = day.label;
+  const note = day.estimated ? 'Estimated from the usual weekly pattern. Wednesdays and Fridays can differ.'
+    : day.source === 'student calendar' ? "From a student calendar, not the school's." : '';
+  els.scheduleNote.textContent = note;
+  els.scheduleNote.hidden = !note;
+  const t = statusText(s);
+  els.scheduleNow.textContent = `${t.main}${t.side ? '. ' + t.side : ''}`;
+  els.scheduleBlocks.replaceChildren();
+  if (!s.blocks.length && s.upcoming) {
+    const u = s.upcoming;
+    els.scheduleNow.textContent = `Next school day: ${u.dateLabel} · ${u.day.type}` + (u.firstBlock ? ` · ${u.firstBlock.name} at ${fmt(u.firstBlock.start)}` : '');
     return;
   }
-  const now = new Date();
-  const day = dayTypeFor(now, scheduleData);
-  els.scheduleDay.textContent = `Today: ${day.label}`;
-  els.scheduleBlocks.replaceChildren();
-  if (!day.schedule) { els.scheduleNow.textContent = ''; return; }
-  const blocks = scheduleData.bell.dayTypes[day.schedule].blocks.filter((b) => !b.optional);
-  const pos = whereInDay(blocks, now);
-  if (pos.current) els.scheduleNow.textContent = `Now: ${pos.current.name}, ${pos.minutesLeft} min left` + (pos.next ? `. Next: ${pos.next.name} at ${fmt(pos.next.start)}` : '');
-  else if (pos.next) els.scheduleNow.textContent = `Next: ${pos.next.name} at ${fmt(pos.next.start)} (in ${pos.minutesUntilNext} min)`;
-  else els.scheduleNow.textContent = 'School day is over.';
-  const nowMin = now.getHours() * 60 + now.getMinutes();
-  for (const b of blocks) {
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  for (const b of s.blocks) {
     const li = document.createElement('li');
     const [eh, em] = b.end.split(':').map(Number);
-    if (b === pos.current) li.classList.add('is-now');
+    if (s.current && b.name === s.current.name && b.start === s.current.start) li.classList.add('is-now');
     else if (eh * 60 + em <= nowMin) li.classList.add('is-past');
     const name = document.createElement('span'); name.textContent = b.name;
-    const t = document.createElement('span'); t.className = 't'; t.textContent = `${fmt(b.start)}–${fmt(b.end)}`;
-    li.append(name, t);
+    const tm = document.createElement('span'); tm.className = 't'; tm.textContent = `${fmt(b.start)}–${fmt(b.end)}`;
+    li.append(name, tm);
     els.scheduleBlocks.appendChild(li);
   }
 }
-setInterval(() => { if (!els.scheduleBlocks.closest('.panel').hidden) renderSchedule(); }, 30000);
+els.nowbar.addEventListener('click', () => {
+  activateTab('tools');
+  els.scheduleCard.scrollIntoView({ block: 'start' });
+});
+setInterval(() => { renderNowbar(); if (!$('#panel-tools').hidden) renderSchedule(); }, 30000);
 
 /* ---------- Page tools ---------- */
 const TOOL_PROMPTS = {
@@ -177,79 +329,163 @@ const TOOL_PROMPTS = {
 };
 document.querySelectorAll('.tool').forEach((btn) => {
   btn.addEventListener('click', () => {
-    els.input.value = TOOL_PROMPTS[btn.dataset.tool] ?? '';
-    document.querySelector('[data-tab="chat"]').click();
-    sendMessage();
+    activateTab('chat');
+    sendMessage(TOOL_PROMPTS[btn.dataset.tool] ?? '');
   });
 });
 
 /* ---------- Update check ---------- */
-async function maybeCheckForUpdate() {
-  if (settings.checkForUpdates === false) return;
-  try {
-    const u = await checkForUpdate();
-    if (u.updateAvailable) {
-      els.updateText.textContent = `v${u.remote} is on GitHub (you have v${u.local}). Pull main, then reload.`;
-      els.updateBanner.hidden = false;
-    }
-  } catch { /* offline or rate-limited: stay quiet */ }
+function renderUpdate(u) {
+  els.updateBanner.hidden = !u.updateAvailable;
+  if (u.updateAvailable) els.updateText.textContent = `v${u.remote} is on GitHub (you have v${u.local}). Pull main, then reload.`;
+  els.updateStatus.textContent = u.error ? u.error : u.updateAvailable ? `v${u.remote} is available.` : 'Up to date.';
+  if (u.releasesUrl) els.releasesLink.href = u.releasesUrl;
+}
+async function runUpdateCheck(force) {
+  if (!force && settings.checkForUpdates === false) { els.updateStatus.textContent = 'Update checks are off.'; return; }
+  els.checkNow.disabled = true;
+  els.updateStatus.textContent = 'Checking…';
+  renderUpdate(await checkForUpdate({ force }));
+  els.checkNow.disabled = false;
 }
 els.updateReload.addEventListener('click', reloadExtension);
+els.checkNow.addEventListener('click', () => runUpdateCheck(true));
 
 /* ---------- Chat ---------- */
-function renderMessage(role, text, pending = false) {
-  els.empty.hidden = true;
+function scrollToEnd() { els.messages.scrollTop = els.messages.scrollHeight; }
+function updateChatState() {
+  const has = !!els.messages.querySelector('.msg');
+  els.empty.hidden = has;
+  els.chatToolbar.hidden = !has;
+}
+function actionButton(label, onClick) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'btn btn--small';
+  b.textContent = label;
+  b.addEventListener('click', () => onClick(b));
+  return b;
+}
+function addActions(bubble, ...buttons) {
+  const row = document.createElement('div');
+  row.className = 'msg__actions';
+  row.append(...buttons);
+  bubble.append(row);
+}
+function renderMessage(role, text) {
   const div = document.createElement('div');
-  div.className = `msg msg--${role}${pending ? ' is-pending' : ''}`;
-  div.textContent = text;
+  div.className = `msg msg--${role}`;
+  if (role === 'ai') {
+    const body = document.createElement('div');
+    body.className = 'md';
+    body.append(renderMarkdown(text));
+    div.append(body);
+    addActions(div, actionButton('Copy', async (b) => {
+      try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; } catch { b.textContent = 'Copy failed'; }
+      setTimeout(() => (b.textContent = 'Copy'), 1500);
+    }));
+  } else {
+    div.textContent = text;
+  }
   els.messages.appendChild(div);
-  els.messages.scrollTop = els.messages.scrollHeight;
+  updateChatState();
+  scrollToEnd();
   return div;
 }
+function renderPending() {
+  const div = document.createElement('div');
+  div.className = 'msg msg--ai is-pending';
+  const dots = document.createElement('span');
+  dots.className = 'dots';
+  dots.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < 3; i++) dots.append(document.createElement('i'));
+  const sr = document.createElement('span');
+  sr.className = 'sr-only';
+  sr.textContent = 'Thinking…';
+  div.append(dots, sr);
+  els.messages.appendChild(div);
+  scrollToEnd();
+  return div;
+}
+function renderError(message, needsSettings) {
+  const div = document.createElement('div');
+  div.className = 'msg msg--error';
+  div.setAttribute('role', 'alert');
+  const p = document.createElement('div');
+  p.textContent = message;
+  div.append(p);
+  const buttons = [actionButton('Retry', () => { div.remove(); updateChatState(); requestReply(); })];
+  if (needsSettings) buttons.push(actionButton('Open Settings', openProviderSettings));
+  addActions(div, ...buttons);
+  els.messages.appendChild(div);
+  updateChatState();
+  scrollToEnd();
+}
+function setBusy(busy) {
+  els.send.hidden = busy;
+  els.stop.hidden = !busy;
+  syncSend();
+}
+function syncSend() { els.send.disabled = !els.input.value.trim(); }
 
-async function sendMessage() {
-  const text = els.input.value.trim();
-  if (!text) return;
+async function sendMessage(override) {
+  const text = (override ?? els.input.value).trim();
+  if (!text || pending) return;
   els.input.value = '';
   autosize();
-  els.send.disabled = true;
-
+  syncSend();
   renderMessage('user', text);
   history.push({ role: 'user', text, at: Date.now() });
+  await requestReply();
+}
 
-  const context = settings.includePageContext ? await getPageContext() : null;
-  const pending = renderMessage('ai', 'Thinking…', true);
+async function requestReply() {
+  if (pending) return;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 120000);
+  const state = { controller, bubble: null, userStopped: false, timedOut: false };
+  pending = state;
+  setBusy(true);
+  const timeout = setTimeout(() => { state.timedOut = true; controller.abort(); }, 120000);
+  state.bubble = renderPending();
   try {
+    const context = settings.includePageContext ? await getPageContext() : null;
     const reply = await generate({ messages: history, context, settings, signal: controller.signal });
-    pending.textContent = reply;
+    state.bubble.remove();
+    renderMessage('ai', reply);
     history.push({ role: 'ai', text: reply, at: Date.now() });
+    await saveHistory(history);
   } catch (err) {
-    pending.textContent = err instanceof ProviderNotConfiguredError
-      ? `${err.message}`
-      : err?.name === 'AbortError' ? 'Timed out waiting for the model.' : `Error: ${err?.message ?? err}`;
-    pending.classList.add('is-error');
+    state.bubble.remove();
+    if (!state.userStopped) {
+      const msg = state.timedOut ? 'Timed out waiting for the model.' : (err?.message ?? String(err));
+      const needs = err instanceof ProviderNotConfiguredError || /reach|rejected|passcode|api key|unauthor/i.test(msg);
+      renderError(msg, needs);
+    }
+    await saveHistory(history);
   } finally {
     clearTimeout(timeout);
-    pending.classList.remove('is-pending');
-    els.send.disabled = false;
-    await saveHistory(history);
+    pending = null;
+    setBusy(false);
     els.input.focus();
   }
 }
 
+els.stop.addEventListener('click', () => {
+  if (!pending) return;
+  pending.userStopped = true;
+  pending.controller.abort();
+});
 els.composer.addEventListener('submit', (e) => { e.preventDefault(); sendMessage(); });
 els.input.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage(); }
 });
 function autosize() {
   els.input.style.height = 'auto';
   els.input.style.height = Math.min(els.input.scrollHeight, 140) + 'px';
 }
-els.input.addEventListener('input', autosize);
+els.input.addEventListener('input', () => { autosize(); syncSend(); });
 document.querySelectorAll('.chip').forEach((chip) => {
-  chip.addEventListener('click', () => { els.input.value = chip.dataset.prompt; autosize(); els.input.focus(); });
+  chip.addEventListener('click', () => sendMessage(chip.dataset.prompt));
 });
 
 /* ---------- Boot ---------- */
@@ -259,14 +495,11 @@ async function boot() {
   history = await loadHistory();
   applyTheme();
   fillSettingsForm();
+  renderProviderChip();
   history.forEach((m) => renderMessage(m.role, m.text));
+  updateChatState();
+  renderNowbar();
   await refreshContext();
-  maybeCheckForUpdate();
-  try {
-    const pong = await chrome.runtime.sendMessage({ type: MSG.PING });
-    els.status.classList.toggle('is-ok', !!pong?.ok);
-  } catch {
-    els.status.classList.add('is-bad');
-  }
+  runUpdateCheck(false);
 }
 boot();
