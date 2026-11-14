@@ -6,7 +6,7 @@ A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Gree
 
 > New here (human or AI)? Read [CONTRIBUTING.md](CONTRIBUTING.md) first. AI coding agents also read [AGENTS.md](AGENTS.md).
 
-<p align="center"><img src="docs/panel-light.png" width="300" alt="Side panel, light" /> <img src="docs/panel-settings-dark.png" width="300" alt="Settings tab, dark" /></p>
+<p align="center"><img src="docs/panel-light.png" width="300" alt="Chat tab with a Markdown reply and the now bar, light mode" /> <img src="docs/panel-tools-dark.png" width="300" alt="Tools tab with the bell schedule and page tools, dark mode" /></p>
 
 ## Get it onto a Mac (or update it)
 

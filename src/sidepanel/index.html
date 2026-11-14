@@ -10,161 +10,199 @@
 <body>
   <div class="app" id="app">
 
-    <!-- Header: logo + title + status -->
     <header class="header">
       <img class="header__logo" src="../../assets/icons/icon-48.png" alt="" width="32" height="32" />
-      <div class="header__text">
-        <h1 class="header__title">Spartan AI</h1>
-        <p class="header__subtitle" id="page-title">No page context</p>
-      </div>
-      <span class="status" id="status" title="Background worker status">●</span>
+      <h1 class="header__title">Spartan AI</h1>
+      <button type="button" class="provider-chip" id="provider-chip" title="Change AI provider">Set up AI</button>
     </header>
+
+    <main class="main">
+    <button type="button" class="nowbar" id="nowbar" hidden>
+      <span class="nowbar__main" id="nowbar-main"></span>
+      <span class="nowbar__side" id="nowbar-side"></span>
+      <div class="nowbar__track"><div class="nowbar__fill" id="nowbar-fill"></div></div>
+    </button>
 
     <div class="banner" id="update-banner" hidden>
       <span id="update-text"></span>
-      <button class="btn btn--small" id="update-reload">Reload</button>
+      <button type="button" class="btn btn--small" id="update-reload">Reload</button>
     </div>
 
-    <!-- Tabs -->
-    <nav class="tabs" role="tablist" aria-label="Sections">
-      <button class="tab is-active" role="tab" aria-selected="true" data-tab="chat">Chat</button>
-      <button class="tab" role="tab" aria-selected="false" data-tab="tools">Tools</button>
-      <button class="tab" role="tab" aria-selected="false" data-tab="settings">Settings</button>
-    </nav>
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <button type="button" class="tab is-active" role="tab" id="tab-chat" aria-controls="panel-chat" aria-selected="true" tabindex="0" data-tab="chat">Chat</button>
+      <button type="button" class="tab" role="tab" id="tab-tools" aria-controls="panel-tools" aria-selected="false" tabindex="-1" data-tab="tools">Tools</button>
+      <button type="button" class="tab" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1" data-tab="settings">Settings</button>
+    </div>
 
     <!-- Chat -->
-    <section class="panel is-active" id="panel-chat" role="tabpanel" data-panel="chat">
-      <div class="messages" id="messages" aria-live="polite">
+    <section class="panel is-active" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat" data-panel="chat">
+      <h2 class="sr-only">Conversation</h2>
+      <div class="chat-toolbar" id="chat-toolbar" hidden>
+        <button type="button" class="btn btn--ghost btn--small" id="new-chat">New chat</button>
+      </div>
+      <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Conversation">
         <div class="empty" id="empty-state">
-          <img src="../../assets/logo-transparent.png" alt="" width="96" height="96" />
-          <h2>Ask Spartan</h2>
-          <p>Summarize this page, explain a selection, or ask anything. Pick a provider in Settings first.</p>
-          <div class="chips">
-            <button class="chip" data-prompt="Summarize this page">Summarize page</button>
-            <button class="chip" data-prompt="Explain the selected text">Explain selection</button>
-            <button class="chip" data-prompt="What should I know about this site?">Key facts</button>
+          <img src="../../assets/logo-transparent.png" alt="" width="72" height="72" />
+          <h3>Ask Spartan</h3>
+          <p>Summarize this page, explain a selection, or ask anything.</p>
+          <div class="chips" id="empty-chips">
+            <button type="button" class="chip" data-prompt="Summarize this page">Summarize page</button>
+            <button type="button" class="chip" data-prompt="Explain the selected text">Explain selection</button>
+            <button type="button" class="chip" data-prompt="What should I know about this site?">Key facts</button>
           </div>
+          <button type="button" class="btn btn--primary" id="empty-setup" hidden>Set up AI</button>
         </div>
       </div>
+      <button type="button" class="context-chip" id="context-chip" aria-pressed="true">Page not included</button>
       <form class="composer" id="composer">
         <textarea id="input" class="composer__input" rows="1" placeholder="Message Spartan…" aria-label="Message"></textarea>
-        <button type="submit" class="btn btn--primary composer__send" id="send" aria-label="Send">Send</button>
+        <button type="submit" class="btn btn--primary composer__send" id="send" disabled>Send</button>
+        <button type="button" class="btn composer__send" id="stop" hidden>Stop</button>
       </form>
       <p class="hint"><kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line.</p>
     </section>
 
     <!-- Tools -->
-    <section class="panel" id="panel-tools" role="tabpanel" data-panel="tools" hidden>
+    <section class="panel" id="panel-tools" role="tabpanel" aria-labelledby="tab-tools" data-panel="tools" hidden>
+      <div class="card" id="schedule-card">
+        <h2>Schedule</h2>
+        <p class="schedule__day" id="schedule-day">Loading…</p>
+        <p class="note" id="schedule-note" hidden></p>
+        <p class="schedule__now" id="schedule-now"></p>
+        <ol class="blocks" id="schedule-blocks"></ol>
+      </div>
       <div class="card">
-        <h3>Page context</h3>
+        <h2>Page tools</h2>
+        <div class="tools">
+          <button type="button" class="tool" data-tool="summarize"><strong>Summarize page</strong><span>5 bullets and why it matters</span></button>
+          <button type="button" class="tool" data-tool="explain"><strong>Explain selection</strong><span>Simple, step by step</span></button>
+          <button type="button" class="tool" data-tool="studyguide"><strong>Study guide</strong><span>Terms, ideas, test questions</span></button>
+          <button type="button" class="tool" data-tool="flashcards"><strong>Flashcards</strong><span>8 Q and A cards</span></button>
+          <button type="button" class="tool" data-tool="cite"><strong>Cite this page</strong><span>MLA 9 and APA 7</span></button>
+          <button type="button" class="tool" data-tool="quiz"><strong>Quiz me</strong><span>5 questions, graded</span></button>
+        </div>
+      </div>
+      <details class="card details">
+        <summary>What the AI can see on this page</summary>
         <dl class="kv">
           <dt>Title</dt><dd id="ctx-title">—</dd>
           <dt>URL</dt><dd id="ctx-url">—</dd>
           <dt>Selection</dt><dd id="ctx-selection">—</dd>
         </dl>
-        <button class="btn" id="refresh-context">Refresh</button>
-      </div>
-      <div class="card" id="schedule-card">
-        <h3>Schedule</h3>
-        <p class="schedule__day" id="schedule-day">Loading…</p>
-        <p class="schedule__now" id="schedule-now"></p>
-        <ol class="blocks" id="schedule-blocks"></ol>
-      </div>
-      <div class="card">
-        <h3>Page tools</h3>
-        <p class="hint">Each one sends a prompt to the AI with the current page attached.</p>
-        <div class="tools">
-          <button class="btn tool" data-tool="summarize">Summarize page</button>
-          <button class="btn tool" data-tool="explain">Explain selection</button>
-          <button class="btn tool" data-tool="studyguide">Study guide</button>
-          <button class="btn tool" data-tool="flashcards">Flashcards</button>
-          <button class="btn tool" data-tool="cite">Cite this page</button>
-          <button class="btn tool" data-tool="quiz">Quiz me</button>
-        </div>
-      </div>
+        <div><button type="button" class="btn" id="refresh-context">Refresh</button></div>
+      </details>
     </section>
 
     <!-- Settings -->
-    <section class="panel" id="panel-settings" role="tabpanel" data-panel="settings" hidden>
-      <form class="card" id="settings-form">
-        <h3>Preferences</h3>
-        <label class="field">
-          <span>Display name</span>
-          <input type="text" name="displayName" placeholder="Optional" />
-        </label>
-        <label class="field">
-          <span>Theme</span>
-          <select name="theme">
-            <option value="system">Match system</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
-        </label>
-        <label class="field field--check">
-          <input type="checkbox" name="includePageContext" />
-          <span>Include page title and selection with messages</span>
-        </label>
-        <label class="field field--check">
-          <input type="checkbox" name="checkForUpdates" />
-          <span>Check GitHub for new versions once an hour</span>
-        </label>
-        <h3>AI provider</h3>
-        <label class="field">
-          <span>Provider</span>
-          <select name="provider">
-            <option value="local">Local model on this computer (Ollama)</option>
-            <option value="anthropic">Anthropic API with my own key</option>
-            <option value="proxy">Team proxy with a passcode</option>
-          </select>
-        </label>
-        <div data-provider-fields="local">
-          <label class="field">
-            <span>Endpoint</span>
-            <input type="url" name="modelEndpoint" placeholder="http://localhost:11434" />
-          </label>
-          <label class="field">
-            <span>Model name</span>
-            <input type="text" name="modelName" placeholder="e.g. llama3" />
-          </label>
-          <p class="hint">Install Ollama, run <code>ollama pull llama3</code>, and keep it running. Nothing leaves your computer.</p>
-        </div>
-        <div data-provider-fields="anthropic proxy" hidden>
-          <label class="field">
-            <span>Claude model</span>
-            <select name="anthropicModel">
-              <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (recommended)</option>
-              <option value="claude-haiku-4-5">Claude Haiku 4.5 (fastest, cheapest)</option>
-              <option value="claude-opus-5-5">Claude Opus 5.5 (strongest, about 2x the cost)</option>
-            </select>
-          </label>
-        </div>
-        <div data-provider-fields="proxy" hidden>
-          <label class="field">
-            <span>Proxy URL</span>
-            <input type="url" name="proxyUrl" placeholder="https://spartan-proxy.example.workers.dev" />
-          </label>
-          <label class="field">
-            <span>Passcode</span>
-            <input type="password" name="proxyPasscode" autocomplete="off" />
-          </label>
-          <p class="hint">The key stays on the proxy. Ask the owner for the URL and passcode. See <code>proxy/README.md</code>.</p>
-        </div>
-        <div data-provider-fields="anthropic" hidden>
-          <label class="field">
-            <span>Anthropic API key</span>
-            <input type="password" name="anthropicApiKey" placeholder="sk-ant-…" autocomplete="off" />
-          </label>
-          <p class="hint">Stored only in this browser on this computer. Never shared, never in the project. Usage bills your key.</p>
-        </div>
-        <div class="row">
-          <button type="submit" class="btn btn--primary">Save</button>
-          <button type="button" class="btn btn--danger" id="clear-history">Clear chat</button>
-        </div>
-        <p class="hint" id="settings-status"></p>
-      </form>
-      <p class="version">Spartan AI <span id="version"></span></p>
+    <section class="panel panel--settings" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" data-panel="settings" hidden>
+      <div class="settings__scroll">
+        <form class="settings__form" id="settings-form">
+          <div class="card">
+            <h2>AI provider</h2>
+            <label class="field">
+              <span>Provider</span>
+              <select name="provider" id="provider-select">
+                <option value="local">Local model on this computer (Ollama)</option>
+                <option value="anthropic">Anthropic API with my own key</option>
+                <option value="proxy">Team proxy with a passcode</option>
+              </select>
+            </label>
+            <div data-provider-fields="local">
+              <label class="field">
+                <span>Endpoint</span>
+                <input type="url" name="modelEndpoint" placeholder="http://localhost:11434" />
+              </label>
+              <label class="field">
+                <span>Model name</span>
+                <input type="text" name="modelName" placeholder="e.g. llama3" />
+              </label>
+              <p class="hint">Install Ollama, run <code>ollama pull llama3</code>, and keep it running. Nothing leaves your computer.</p>
+            </div>
+            <div data-provider-fields="anthropic proxy" hidden>
+              <label class="field">
+                <span>Claude model</span>
+                <select name="anthropicModel">
+                  <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (recommended)</option>
+                  <option value="claude-haiku-4-5">Claude Haiku 4.5 (fastest, cheapest)</option>
+                  <option value="claude-opus-5-5">Claude Opus 5.5 (strongest, about 2x the cost)</option>
+                </select>
+              </label>
+            </div>
+            <div data-provider-fields="proxy" hidden>
+              <label class="field">
+                <span>Proxy URL</span>
+                <input type="url" name="proxyUrl" placeholder="https://spartan-proxy.example.workers.dev" />
+              </label>
+              <label class="field">
+                <span>Passcode</span>
+                <input type="password" name="proxyPasscode" autocomplete="off" />
+              </label>
+              <p class="hint">The key stays on the proxy. Ask the owner for the URL and passcode.</p>
+            </div>
+            <div data-provider-fields="anthropic" hidden>
+              <label class="field">
+                <span>Anthropic API key</span>
+                <input type="password" name="anthropicApiKey" placeholder="sk-ant-…" autocomplete="off" />
+              </label>
+              <p class="hint">Stored only in this browser on this computer. Never shared. Usage bills your key.</p>
+            </div>
+            <div class="row">
+              <button type="button" class="btn" id="test-connection">Test connection</button>
+              <span class="test-status" id="test-status" role="status"></span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Preferences</h2>
+            <label class="field">
+              <span>Display name</span>
+              <input type="text" name="displayName" placeholder="Optional" />
+            </label>
+            <label class="field">
+              <span>Theme</span>
+              <select name="theme">
+                <option value="system">Match system</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </label>
+            <label class="field field--check">
+              <input type="checkbox" name="includePageContext" />
+              <span>Include page title and selection with messages</span>
+            </label>
+            <label class="field field--check">
+              <input type="checkbox" name="showZeroPeriod" />
+              <span>Show 0 period (7:15) in the schedule</span>
+            </label>
+            <label class="field field--check">
+              <input type="checkbox" name="checkForUpdates" />
+              <span>Check GitHub for new versions</span>
+            </label>
+          </div>
+
+          <div class="card">
+            <h2>Data and privacy</h2>
+            <p class="hint">Chats, settings and any key you enter are stored only in this browser on this computer.</p>
+            <div><button type="button" class="btn btn--danger" id="clear-history">Clear chat history</button></div>
+          </div>
+
+        </form>
+          <div class="about">
+            <p class="about__title">Spartan AI <span id="version"></span></p>
+            <p class="hint" id="update-status" role="status"></p>
+            <div class="row">
+              <button type="button" class="btn btn--small" id="check-now">Check for updates</button>
+              <a class="link link--block" id="releases-link" href="https://github.com/" target="_blank" rel="noopener noreferrer">Releases on GitHub</a>
+            </div>
+          </div>
+      </div>
+      <div class="settings__footer">
+        <button type="submit" form="settings-form" class="btn btn--primary">Save</button>
+        <span class="save-status" id="settings-status" role="status"></span>
+      </div>
     </section>
 
+    </main>
   </div>
   <script type="module" src="./sidepanel.js"></script>
 </body>
