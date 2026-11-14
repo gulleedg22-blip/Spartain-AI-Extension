@@ -2,11 +2,21 @@
 
 A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Green and white, Spartan helmet logo.
 
-**Current state: working chat and tools.** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Current state: working chat and tools (v0.5.0).** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 > New here (human or AI)? Read [CONTRIBUTING.md](CONTRIBUTING.md) first. AI coding agents also read [AGENTS.md](AGENTS.md).
 
 <p align="center"><img src="docs/panel-light.png" width="300" alt="Side panel, light" /> <img src="docs/panel-settings-dark.png" width="300" alt="Settings tab, dark" /></p>
+
+## Get it onto a Mac (or update it)
+
+Paste this into Terminal. It clones the repo into your home folder the first time and pulls the latest version every time after:
+
+```bash
+cd ~ && { [ -d Spartain-AI-Extension/.git ] && git -C Spartain-AI-Extension pull --ff-only || git clone https://github.com/gulleedg22-blip/Spartain-AI-Extension.git; }
+```
+
+The repository is private, so the first run asks you to sign in to GitHub. The quickest sign-in is the GitHub CLI: `brew install gh && gh auth login`, once. After a pull, click the reload icon on the Spartan AI card in `chrome://extensions`.
 
 ## Load it in Chrome
 
@@ -31,13 +41,14 @@ src/
   content/content.js            Page title / URL / selection reader (read-only)
   sidepanel/index.html          The side panel UI (Chat, Tools, Settings tabs)
   sidepanel/sidepanel.css       Layout styles
-  sidepanel/sidepanel.js        Tabs, chat rendering, composer, settings form
+  sidepanel/sidepanel.js        Tabs, now bar, chat, composer, tools, settings form
+  sidepanel/markdown.js         Safe Markdown renderer for AI replies (DOM nodes only, never innerHTML)
   sidepanel/storage.js          chrome.storage persistence
   sidepanel/page-context.js     Current-tab context
   shared/theme.css              Color and spacing tokens (brand green lives here)
   shared/messages.js            Message types + storage keys shared by all scripts
   data/bell-schedule.json       Official DLS bell schedule, six day types
-  data/school-calendar-2026-27.json  Semester dates, no-class days, observed day types
+  data/school-calendar-2026-27.json  Semester dates, breaks, finals, day type for every class day through May 12
   tools/schedule.js             Day type, current block, next block (pure functions)
   update/check.js               Compares installed version with main on GitHub
   data/profile.example.json     Example student profile shape with made-up grades
@@ -78,6 +89,7 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 - [x] Page title, URL, and selected text sent with messages (toggle in Settings)
 - [x] Tools tab: live bell schedule (today's day type, current and next block) and six page tools
 - [x] Update banner with one-click reload; zip attached to a GitHub Release on every merge
+- [x] v0.5.0 UI: now bar with the current period on every tab, Markdown replies with Copy, Stop and Retry, page-context chip, Test connection, keyboard-navigable tabs, readable dark mode
 - [ ] Streaming replies
 - [ ] Profile editor (roadmap 5b)
 - [ ] Chrome Web Store listing (needed for true auto-update)
@@ -91,14 +103,15 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 
 ## Tools tab
 
-- **Schedule**: today's day type from `src/data/school-calendar-2026-27.json` (observed days first, then the Mon 0-7 / Tue-Thu A / Wed-Fri B pattern), the block happening now, minutes left, and what is next. Times come from the official bell schedule.
+- **Schedule**: today's day type, the block happening now, minutes left, and what is next. The same line shows in the now bar under the header on every tab. Times come from the official bell schedule. The day type comes from `src/data/school-calendar-2026-27.json`, most trusted source first: the school's published calendar (September 28 to October 30, 2026), holidays, breaks and finals from the calendar framework, then a student's calendar for November 2 to May 12 (not official; it matched the school's calendar on 22 of 22 October class days), then the Mon 0-7 / Tue-Thu A / Wed-Fri B pattern, which the panel labels as an estimate. Short weeks break the pattern (Monday, November 2 was an A-Day), which is why the dated entries matter.
 - **Page tools**: Summarize, Explain selection, Study guide, Flashcards, Cite (MLA and APA), Quiz me. Each sends a prompt with the page attached and switches to Chat.
 
 ## Updating
 
 Chrome only auto-updates extensions installed from the Chrome Web Store. For an unpacked install:
 
-- **From a git clone**: the panel checks `main` once an hour and shows a banner when a newer version exists. Run `git pull`, then click **Reload** in the banner (or the reload icon in `chrome://extensions`).
+- **From a git clone**: run the command under "Get it onto a Mac", then click the reload icon in `chrome://extensions`.
+- **The update banner needs a public repository.** The panel checks `manifest.json` on `main` once an hour and shows a banner with a Reload button when a newer version exists. GitHub answers 404 for a private repository, and the extension must never hold a GitHub token, so while this repo is private the check cannot work. Settings > About shows the reason. Nothing in the repo is secret (`npm run check` blocks keys), so making it public is safe if the owner wants the banner.
 - **From a zip**: every merge to `main` attaches `spartan-ai.zip` to a [GitHub Release](https://github.com/gulleedg22-blip/Spartain-AI-Extension/releases/latest). Download, unzip over your old folder, reload.
 - **Real auto-update**: publish to the Chrome Web Store (one-time $5 developer registration, a few days of review). After that, Chrome updates everyone automatically and the Release zip is what you upload. The release workflow can be extended to publish there once the store credentials exist as repository secrets.
 

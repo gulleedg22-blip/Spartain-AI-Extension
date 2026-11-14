@@ -24,7 +24,8 @@ You are working on **Spartan AI**, a **Google Chrome extension using Manifest V3
 | Model call | `src/ai/provider.js` |
 | Persistence | `src/sidepanel/storage.js` |
 | Static data (bell schedule, calendar, example profile) | `src/data/*.json`. Never commit a real student's grades |
-| Schedule logic | `src/tools/schedule.js` (pure functions; keep UI out) |
+| Schedule logic | `src/tools/schedule.js` (pure functions; keep UI out). The UI calls `scheduleSnapshot()` |
+| Rendering AI replies | `src/sidepanel/markdown.js`. Builds DOM nodes only |
 | Update check | `src/update/check.js` |
 | Open work list | `docs/ROADMAP.md` |
 
@@ -40,6 +41,13 @@ You are working on **Spartan AI**, a **Google Chrome extension using Manifest V3
 8. Chrome APIs return Promises in MV3; use `await`, not callbacks. Wrap `chrome.tabs.sendMessage` in try/catch (the receiver may not exist).
 9. Keep changes small and in scope. Do not refactor unrelated files.
 10. Before finishing: run `npm run check`. If you changed UI, describe how to verify it in `chrome://extensions` > Load unpacked.
+
+## UI rules that have each caused a shipped bug
+
+- `hidden` loses to any CSS `display` rule. `sidepanel.css` has `[hidden] { display: none !important; }`; keep it, and toggle visibility with the `hidden` property.
+- Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML` or `DOMParser` in the side panel. Model replies and web page text are untrusted and this page has extension privileges. Use `textContent` and `renderMarkdown()`.
+- Brand green is a fill color. As text on the page background use `--sp-accent-text`; `--sp-accent` is unreadable as text in dark mode.
+- Check every UI change in light and dark, at 280px wide, and in the empty, pending and error states.
 
 ## Testing a change
 
