@@ -34,7 +34,7 @@ export async function checkForUpdate({ force = false } = {}) {
   let remote = null, error = null;
   try {
     const res = await fetch(MANIFEST_URL, { cache: 'no-store' });
-    if (res.status === 404) error = 'GitHub answered 404. The repository is private, so the extension cannot see new versions. Update with git pull, or make the repository public.';
+    if (res.status === 404) error = 'GitHub answered 404. The repository may be private or renamed, so the extension cannot see new versions. Update with git pull.';
     else if (!res.ok) error = `GitHub answered ${res.status}.`;
     else remote = (await res.json()).version ?? null;
   } catch (e) {

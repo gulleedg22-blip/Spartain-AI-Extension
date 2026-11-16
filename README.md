@@ -2,7 +2,7 @@
 
 A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Green and white, Spartan helmet logo.
 
-**Current state: working chat and tools (v0.5.0).** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Current state: working chat and tools (v0.5.1).** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 > New here (human or AI)? Read [CONTRIBUTING.md](CONTRIBUTING.md) first. AI coding agents also read [AGENTS.md](AGENTS.md).
 
@@ -16,7 +16,7 @@ Paste this into Terminal. It clones the repo into your home folder the first tim
 cd ~ && { [ -d Spartain-AI-Extension/.git ] && git -C Spartain-AI-Extension pull --ff-only || git clone https://github.com/gulleedg22-blip/Spartain-AI-Extension.git; }
 ```
 
-The repository is private, so the first run asks you to sign in to GitHub. The quickest sign-in is the GitHub CLI: `brew install gh && gh auth login`, once. After a pull, click the reload icon on the Spartan AI card in `chrome://extensions`.
+The repository is public, so no sign-in is needed. After a pull, click the reload icon on the Spartan AI card in `chrome://extensions`. Settings and chat history are tied to the folder Chrome loaded, so keep using the same folder.
 
 ## Load it in Chrome
 
@@ -96,10 +96,10 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 
 ## Using it
 
-1. Load unpacked (above), open the panel, go to **Settings**.
-2. **Local model**: install Ollama, run `ollama pull llama3`, leave Ollama running. Endpoint `http://localhost:11434`, model `llama3`. Save.
-3. **Anthropic**: pick "Anthropic API with my own key", paste your key, Save. The key lives in your browser profile only. Usage bills your key.
-4. **Team proxy**: the owner deploys `proxy/` once (5 minutes, free), then shares a URL and passcode. Pick "Team proxy with a passcode", enter both, Save. Nobody but the owner ever sees the key.
+1. Load unpacked (above), open the panel, go to **Settings**. Changes save automatically; there is no Save button. **Test connection** confirms the provider works.
+2. **Local model**: install Ollama, run `ollama pull llama3`, leave Ollama running. Endpoint `http://localhost:11434`, model `llama3`.
+3. **Anthropic**: pick "Anthropic API with my own key" and paste your key. The key lives in your browser profile only. Usage bills your key.
+4. **Team proxy**: the owner deploys `proxy/` once (5 minutes, free), then shares a URL and passcode. Pick "Team proxy with a passcode" and enter both. Nobody but the owner ever sees the key.
 
 ## Tools tab
 
@@ -111,7 +111,7 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 Chrome only auto-updates extensions installed from the Chrome Web Store. For an unpacked install:
 
 - **From a git clone**: run the command under "Get it onto a Mac", then click the reload icon in `chrome://extensions`.
-- **The update banner needs a public repository.** The panel checks `manifest.json` on `main` once an hour and shows a banner with a Reload button when a newer version exists. GitHub answers 404 for a private repository, and the extension must never hold a GitHub token, so while this repo is private the check cannot work. Settings > About shows the reason. Nothing in the repo is secret (`npm run check` blocks keys), so making it public is safe if the owner wants the banner.
+- **Update banner.** The panel checks `manifest.json` on `main` once an hour and shows a banner with a Reload button when a newer version exists. This works because the repository is public; a private repository answers 404 and the extension must never hold a GitHub token. Settings > About shows the last result.
 - **From a zip**: every merge to `main` attaches `spartan-ai.zip` to a [GitHub Release](https://github.com/gulleedg22-blip/Spartain-AI-Extension/releases/latest). Download, unzip over your old folder, reload.
 - **Real auto-update**: publish to the Chrome Web Store (one-time $5 developer registration, a few days of review). After that, Chrome updates everyone automatically and the Release zip is what you upload. The release workflow can be extended to publish there once the store credentials exist as repository secrets.
 

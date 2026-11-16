@@ -159,18 +159,20 @@ function showProviderFields(provider) {
   });
 }
 form.provider.addEventListener('change', (e) => { showProviderFields(e.target.value); els.testStatus.textContent = ''; });
-form.theme.addEventListener('change', () => applyTheme(form.theme.value)); // preview; persisted on Save
+form.theme.addEventListener('change', () => applyTheme(form.theme.value)); // live preview; commitSettings() persists it
 
+const RESTING = 'Changes save automatically.';
 let flashTimer;
 function flash(text) {
   els.settingsStatus.textContent = text;
   els.settingsStatus.classList.add('is-ok');
   clearTimeout(flashTimer);
-  flashTimer = setTimeout(() => { els.settingsStatus.textContent = ''; els.settingsStatus.classList.remove('is-ok'); }, 2500);
+  flashTimer = setTimeout(() => { els.settingsStatus.textContent = RESTING; els.settingsStatus.classList.remove('is-ok'); }, 2000);
 }
-els.settingsForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  settings = readForm();
+async function commitSettings() {
+  const next = readForm();
+  if (JSON.stringify(next) === JSON.stringify(settings)) return;
+  settings = next;
   await saveSettings(settings);
   applyTheme();
   renderProviderChip();
@@ -178,10 +180,33 @@ els.settingsForm.addEventListener('submit', async (e) => {
   renderSchedule();
   refreshContext();
   flash('Saved.');
+}
+let saveTimer = null;
+function flushPending() {
+  if (saveTimer === null) return;
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  commitSettings();
+}
+els.settingsForm.addEventListener('change', () => { clearTimeout(saveTimer); saveTimer = null; commitSettings(); });
+els.settingsForm.addEventListener('input', (e) => {
+  if (!['text', 'url', 'password'].includes(e.target.type)) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { saveTimer = null; commitSettings(); }, 600);
 });
+els.settingsForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  commitSettings();
+});
+window.addEventListener('pagehide', flushPending);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushPending(); });
 
 els.testConnection.addEventListener('click', async () => {
-  const trial = readForm();
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  await commitSettings();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 30000);
   const started = performance.now();
@@ -189,7 +214,7 @@ els.testConnection.addEventListener('click', async () => {
   els.testStatus.className = 'test-status';
   els.testStatus.textContent = 'Testing…';
   try {
-    await generate({ messages: [{ role: 'user', text: 'Reply with the single word OK.', at: Date.now() }], context: null, settings: trial, signal: controller.signal });
+    await generate({ messages: [{ role: 'user', text: 'Reply with the single word OK.', at: Date.now() }], context: null, settings, signal: controller.signal });
     els.testStatus.textContent = `Connected. Replied in ${((performance.now() - started) / 1000).toFixed(1)} s.`;
     els.testStatus.classList.add('is-ok');
   } catch (err) {
