@@ -2,7 +2,7 @@
 
 A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Green and white, Spartan helmet logo.
 
-**Current state: working chat and tools (v0.6.0).** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Current state: working chat and tools (v0.6.1).** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 > Using Spartan AI means accepting the [Terms of Use](src/legal/terms.md) and reading the [AI Disclaimer](src/legal/ai-disclaimer.md). It is a student project, not an official De La Salle High School product.
 
@@ -123,8 +123,9 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 
 Chrome only auto-updates extensions installed from the Chrome Web Store. For an unpacked install:
 
-- **From a git clone**: run the command under "Get it onto a Mac", then click the reload icon in `chrome://extensions`.
-- **Update banner.** The panel checks `manifest.json` on `main` once an hour and shows a banner with a Reload button when a newer version exists. This works because the repository is public; a private repository answers 404 and the extension must never hold a GitHub token. Settings > About shows the last result.
+- **From a git clone**: run the command under "Get it onto a Mac". The extension cannot download files itself, so this step is always needed.
+- **The banner tells you which step you are on.** When GitHub has a newer version than your folder, it says so and offers **Copy command**. Once you have run the command, the banner notices the new files on its own and switches to **Reload**, which applies them. Reload closes the panel; open it again.
+- **How it knows.** It compares three versions: the one Chrome has loaded, the one in your folder, and the one on `main` on GitHub (checked once an hour; needs the repository to be public). Settings > About shows the last result.
 - **From a zip**: every merge to `main` attaches `spartan-ai.zip` to a [GitHub Release](https://github.com/gulleedg22-blip/Spartain-AI-Extension/releases/latest). Download, unzip over your old folder, reload.
 - **Real auto-update**: publish to the Chrome Web Store (one-time $5 developer registration, a few days of review). After that, Chrome updates everyone automatically and the Release zip is what you upload. The release workflow can be extended to publish there once the store credentials exist as repository secrets.
 

@@ -38,7 +38,7 @@ You are working on **Spartan AI**, a **Google Chrome extension using Manifest V3
 4. Side panel and background scripts are ES modules and import from `src/shared/messages.js`.
 5. Add a message type to `MSG` in `messages.js` before sending it.
 6. Every new `permissions` / `host_permissions` entry must be justified in the PR description. Prefer `activeTab` over broad host permissions.
-7. Never embed API keys or tokens in code or files. The only key is the one a user types into Settings, and it stays in their `chrome.storage.local`. `host_permissions` is limited to localhost, api.anthropic.com, *.workers.dev, and raw.githubusercontent.com (update check); justify any addition.
+7. Never embed API keys or tokens in code or files. The only key is the one a user types into Settings, and it stays in their `chrome.storage.local`. `host_permissions`: localhost, api.anthropic.com, *.workers.dev, raw.githubusercontent.com (update check), and `http://*/*` + `https://*/*` with the `scripting` permission, used only by `src/sidepanel/page-context.js` to read the title, URL and selection of the active tab when its content script is missing (tabs opened before the extension was last reloaded). The content script already matched all sites, so this adds no new install warning. Justify any addition.
 8. Chrome APIs return Promises in MV3; use `await`, not callbacks. Wrap `chrome.tabs.sendMessage` in try/catch (the receiver may not exist).
 9. Keep changes small and in scope. Do not refactor unrelated files.
 10. Before finishing: run `npm run check`. If you changed UI, describe how to verify it in `chrome://extensions` > Load unpacked.

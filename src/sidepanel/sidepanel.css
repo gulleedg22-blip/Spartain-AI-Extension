@@ -195,8 +195,9 @@ kbd { font-family: inherit; border: 1px solid var(--sp-border); border-radius: 4
 .about__title { margin: 0; font-weight: 600; font-size: 13px; }
 
 /* Update banner */
-.banner { display: flex; align-items: center; gap: var(--sp-space-2); padding: 6px var(--sp-space-3); background: var(--sp-warning-bg); color: var(--sp-text); font-size: 12px; border-bottom: 1px solid var(--sp-border); }
-.banner span { flex: 1; min-width: 0; }
+.banner { display: flex; align-items: flex-start; gap: var(--sp-space-2); padding: 6px var(--sp-space-3); background: var(--sp-warning-bg); color: var(--sp-text); font-size: 12px; border-bottom: 1px solid var(--sp-border); }
+.banner span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.banner .btn { flex: 0 0 auto; }
 
 /* Schedule */
 .schedule__day { margin: 0; font-weight: 700; }

@@ -61,6 +61,7 @@ const els = {
   updateBanner: $('#update-banner'),
   updateText: $('#update-text'),
   updateReload: $('#update-reload'),
+  updateCopy: $('#update-copy'),
 };
 const form = els.settingsForm.elements;
 
@@ -365,10 +366,21 @@ document.querySelectorAll('.tool').forEach((btn) => {
 });
 
 /* ---------- Update check ---------- */
+let lastUpdate = null;
 function renderUpdate(u) {
-  els.updateBanner.hidden = !u.updateAvailable;
-  if (u.updateAvailable) els.updateText.textContent = `v${u.remote} is on GitHub (you have v${u.local}). Pull main, then reload.`;
-  els.updateStatus.textContent = u.error ? u.error : u.updateAvailable ? `v${u.remote} is available.` : 'Up to date.';
+  lastUpdate = u;
+  const { state } = u;
+  els.updateBanner.hidden = state !== 'downloaded' && state !== 'available';
+  els.updateReload.hidden = state !== 'downloaded';
+  els.updateCopy.hidden = state !== 'available';
+  if (state === 'downloaded') els.updateText.textContent = `v${u.disk} is downloaded. Reload to finish. The panel will close; open it again.`;
+  if (state === 'available') els.updateText.textContent = `v${u.remote} is on GitHub (you have v${u.local}). Run the update command in Terminal; this banner will then offer Reload.`;
+  els.updateStatus.textContent = {
+    downloaded: `v${u.disk} is downloaded. Reload to finish.`,
+    available: `v${u.remote} is available. Run the update command in Terminal, then reload.`,
+    error: u.error,
+    current: `Up to date (v${u.local}).`,
+  }[state] ?? '';
   if (u.releasesUrl) els.releasesLink.href = u.releasesUrl;
 }
 async function runUpdateCheck(force) {
@@ -378,6 +390,17 @@ async function runUpdateCheck(force) {
   renderUpdate(await checkForUpdate({ force }));
   els.checkNow.disabled = false;
 }
+// Quiet re-check: no "Checking…" text, button untouched.
+async function backgroundUpdateCheck() {
+  if (settings.checkForUpdates === false) return;
+  renderUpdate(await checkForUpdate({ force: false }));
+}
+window.addEventListener('focus', backgroundUpdateCheck);
+setInterval(() => { if (lastUpdate?.state === 'available') backgroundUpdateCheck(); }, 15000);
+els.updateCopy.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(lastUpdate.command); els.updateCopy.textContent = 'Copied'; } catch { els.updateCopy.textContent = 'Copy failed'; }
+  setTimeout(() => (els.updateCopy.textContent = 'Copy command'), 1500);
+});
 els.updateReload.addEventListener('click', reloadExtension);
 els.checkNow.addEventListener('click', () => runUpdateCheck(true));
 
