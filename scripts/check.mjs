@@ -22,10 +22,10 @@ for (const r of refs) existsSync(r) ? ok(`exists: ${r}`) : fail(`manifest refere
 if (!/^\d+\.\d+\.\d+$/.test(manifest.version)) fail(`version "${manifest.version}" is not MAJOR.MINOR.PATCH`);
 
 // 2. every JS file under src/ parses
-function walk(dir) {
+function walk(dir, exts = ['.js']) {
   return readdirSync(dir).flatMap((n) => {
     const p = join(dir, n);
-    return statSync(p).isDirectory() ? walk(p) : p.endsWith('.js') ? [p] : [];
+    return statSync(p).isDirectory() ? walk(p, exts) : exts.some((e) => p.endsWith(e)) ? [p] : [];
   });
 }
 for (const f of walk('src')) {
@@ -34,7 +34,7 @@ for (const f of walk('src')) {
 }
 
 // 3. no hex colors outside theme.css
-for (const f of walk('src').concat(['src/sidepanel/sidepanel.css', 'src/sidepanel/index.html'])) {
+for (const f of walk('src', ['.js', '.css', '.html'])) {
   if (f.endsWith('theme.css')) continue;
   const hits = readFileSync(f, 'utf8').match(/#[0-9a-fA-F]{6}\b/g);
   if (hits) fail(`hex color(s) ${[...new Set(hits)].join(', ')} in ${f}; move to src/shared/theme.css`);
@@ -47,6 +47,15 @@ if (/^\s*(import|export)\s/m.test(readFileSync('src/content/content.js', 'utf8')
 for (const f of readdirSync('src/data').filter((n) => n.endsWith('.json'))) {
   try { JSON.parse(readFileSync(join('src/data', f), 'utf8')); ok(`json: src/data/${f}`); }
   catch (e) { fail(`invalid JSON in src/data/${f}: ${e.message}`); }
+}
+
+// 5b. the Terms of Use date and TERMS_VERSION must agree, so a terms change always re-prompts users
+{
+  const version = readFileSync('src/shared/messages.js', 'utf8').match(/TERMS_VERSION = '(\d{4}-\d{2}-\d{2})'/)?.[1];
+  const printed = readFileSync('src/legal/terms.md', 'utf8').match(/^Last updated: (.+)$/m)?.[1];
+  const iso = printed ? new Date(printed + ' UTC').toISOString().slice(0, 10) : null;
+  if (!version || version !== iso) fail(`TERMS_VERSION (${version}) does not match "Last updated: ${printed}" in src/legal/terms.md`);
+  else ok(`terms version ${version} matches src/legal/terms.md`);
 }
 
 // 6. no API keys or tokens anywhere in tracked files
