@@ -18,11 +18,16 @@ export const STORAGE_KEYS = Object.freeze({
   HISTORY: 'spartain.history',
 });
 
+// Date of the current Terms of Use (src/legal/terms.md). Change it whenever the terms change;
+// the side panel then asks every user to agree again before chatting.
+export const TERMS_VERSION = '2026-11-16';
+
 export const DEFAULT_SETTINGS = Object.freeze({
   theme: 'system',        // 'system' | 'light' | 'dark'
   includePageContext: true,
   checkForUpdates: true,
-  showZeroPeriod: false,  // show 0 period (7:15) in the schedule
+  showZeroPeriod: false,
+  termsAccepted: '',      // TERMS_VERSION the user agreed to, or '' if never  // show 0 period (7:15) in the schedule
   displayName: '',
   provider: 'local',      // 'local' (Ollama) | 'anthropic' (user's own key) | 'proxy' (team proxy + passcode)
   modelEndpoint: 'http://localhost:11434',

@@ -3,7 +3,7 @@
   "name": "Spartan AI",
   "short_name": "Spartan",
   "description": "Spartan AI side panel for Chrome. Built for Spartans, in green and white.",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "assets/icons/icon-16.png",

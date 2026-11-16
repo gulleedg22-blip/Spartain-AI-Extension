@@ -8,7 +8,7 @@
 //   src/tools/schedule.js         -> schedule snapshot
 //   src/update/check.js           -> update check
 
-import { MSG, DEFAULT_SETTINGS } from '../shared/messages.js';
+import { MSG, DEFAULT_SETTINGS, TERMS_VERSION } from '../shared/messages.js';
 import { generate, ProviderNotConfiguredError } from '../ai/provider.js';
 import { loadSettings, saveSettings, loadHistory, saveHistory, clearHistory } from './storage.js';
 import { getPageContext } from './page-context.js';
@@ -27,6 +27,10 @@ const els = {
   chatToolbar: $('#chat-toolbar'),
   newChat: $('#new-chat'),
   composer: $('#composer'),
+  gate: $('#terms-gate'),
+  termsAccept: $('#terms-accept'),
+  termsStatus: $('#terms-status'),
+  chatHint: $('#chat-hint'),
   input: $('#input'),
   send: $('#send'),
   stop: $('#stop'),
@@ -354,6 +358,7 @@ const TOOL_PROMPTS = {
 };
 document.querySelectorAll('.tool').forEach((btn) => {
   btn.addEventListener('click', () => {
+    if (needTerms()) return;
     activateTab('chat');
     sendMessage(TOOL_PROMPTS[btn.dataset.tool] ?? '');
   });
@@ -378,10 +383,37 @@ els.checkNow.addEventListener('click', () => runUpdateCheck(true));
 
 /* ---------- Chat ---------- */
 function scrollToEnd() { els.messages.scrollTop = els.messages.scrollHeight; }
+const termsOk = () => settings.termsAccepted === TERMS_VERSION;
+function termsDate() {
+  const [y, m, d] = TERMS_VERSION.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+function renderTermsGate() {
+  const ok = termsOk();
+  els.gate.hidden = ok;
+  els.messages.hidden = !ok;
+  els.contextChip.hidden = !ok;
+  els.composer.hidden = !ok;
+  els.chatHint.hidden = !ok;
+  els.termsStatus.textContent = ok ? `You agreed to the terms dated ${termsDate()}.` : 'You have not agreed yet. Open Chat to review and agree.';
+  updateChatState();
+}
+function needTerms() {
+  if (termsOk()) return false;
+  activateTab('chat');
+  els.termsAccept.focus();
+  return true;
+}
+els.termsAccept.addEventListener('click', async () => {
+  settings = { ...settings, termsAccepted: TERMS_VERSION };
+  await saveSettings(settings);
+  renderTermsGate();
+  els.input.focus();
+});
 function updateChatState() {
   const has = !!els.messages.querySelector('.msg');
   els.empty.hidden = has;
-  els.chatToolbar.hidden = !has;
+  els.chatToolbar.hidden = !has || !termsOk();
 }
 function actionButton(label, onClick) {
   const b = document.createElement('button');
@@ -455,7 +487,7 @@ function syncSend() { els.send.disabled = !els.input.value.trim(); }
 
 async function sendMessage(override) {
   const text = (override ?? els.input.value).trim();
-  if (!text || pending) return;
+  if (!termsOk() || !text || pending) return;
   els.input.value = '';
   autosize();
   syncSend();
@@ -465,7 +497,7 @@ async function sendMessage(override) {
 }
 
 async function requestReply() {
-  if (pending) return;
+  if (pending || !termsOk()) return;
   const controller = new AbortController();
   const state = { controller, bubble: null, userStopped: false, timedOut: false };
   pending = state;
@@ -510,7 +542,7 @@ function autosize() {
 }
 els.input.addEventListener('input', () => { autosize(); syncSend(); });
 document.querySelectorAll('.chip').forEach((chip) => {
-  chip.addEventListener('click', () => sendMessage(chip.dataset.prompt));
+  chip.addEventListener('click', () => { if (!needTerms()) sendMessage(chip.dataset.prompt); });
 });
 
 /* ---------- Boot ---------- */
@@ -521,6 +553,7 @@ async function boot() {
   applyTheme();
   fillSettingsForm();
   renderProviderChip();
+  renderTermsGate();
   history.forEach((m) => renderMessage(m.role, m.text));
   updateChatState();
   renderNowbar();

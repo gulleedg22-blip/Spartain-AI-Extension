@@ -35,7 +35,7 @@ function lines(text, parent) {
   });
 }
 
-export function renderMarkdown(text) {
+export function renderMarkdown(text, { headingLevel = 3 } = {}) {
   const out = document.createDocumentFragment();
   const src = String(text ?? '').replace(/\r\n?/g, '\n').split('\n');
   let i = 0;
@@ -59,7 +59,7 @@ export function renderMarkdown(text) {
 
     const h = line.match(/^(#{1,3})\s+(.*)$/);
     if (h) {
-      const n = el(h[1].length < 3 ? 'h3' : 'h4', 'md-h');
+      const n = el(`h${headingLevel + (h[1].length < 3 ? 0 : 1)}`, 'md-h');
       inline(h[2], n);
       out.append(n); i++; continue;
     }

@@ -2,7 +2,9 @@
 
 A **Google Chrome extension** (Manifest V3) that opens as a **side panel**. Green and white, Spartan helmet logo.
 
-**Current state: working chat and tools (v0.5.1).** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Current state: working chat and tools (v0.6.0).** Three AI backends, chosen in Settings: a **local model** through [Ollama](https://ollama.com) on your own computer (default, nothing leaves your machine), the **Anthropic API with your own key** (stored only in your browser, never in this repo), or a **team proxy** that holds one shared key server-side and takes a passcode (see [proxy/README.md](proxy/README.md)). Page context, settings, and chat history persist. Open work is in [docs/ROADMAP.md](docs/ROADMAP.md).
+
+> Using Spartan AI means accepting the [Terms of Use](src/legal/terms.md) and reading the [AI Disclaimer](src/legal/ai-disclaimer.md). It is a student project, not an official De La Salle High School product.
 
 > New here (human or AI)? Read [CONTRIBUTING.md](CONTRIBUTING.md) first. AI coding agents also read [AGENTS.md](AGENTS.md).
 
@@ -51,6 +53,9 @@ src/
   data/school-calendar-2026-27.json  Semester dates, breaks, finals, day type for every class day through May 12
   tools/schedule.js             Day type, current block, next block (pure functions)
   update/check.js               Compares installed version with main on GitHub
+  legal/terms.md                Terms of Use (shown in the extension and here)
+  legal/ai-disclaimer.md        AI Disclaimer
+  legal/legal.html, .js, .css   In-extension page that renders the two documents
   data/profile.example.json     Example student profile shape with made-up grades
 proxy/                        Optional Cloudflare Worker that holds a shared key behind a passcode
 docs/source/                  The school's bell schedule and calendar PDFs the data files came from
@@ -90,6 +95,7 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 - [x] Tools tab: live bell schedule (today's day type, current and next block) and six page tools
 - [x] Update banner with one-click reload; zip attached to a GitHub Release on every merge
 - [x] v0.5.0 UI: now bar with the current period on every tab, Markdown replies with Copy, Stop and Retry, page-context chip, Test connection, keyboard-navigable tabs, readable dark mode
+- [x] Terms of Use and AI Disclaimer: one-time "I agree" before first chat, a disclaimer line under the message box, and a Terms card in Settings
 - [ ] Streaming replies
 - [ ] Profile editor (roadmap 5b)
 - [ ] Chrome Web Store listing (needed for true auto-update)
@@ -100,6 +106,13 @@ Reference site: https://www.dlshs.org/. Edit colors only in `src/shared/theme.cs
 2. **Local model**: install Ollama, run `ollama pull llama3`, leave Ollama running. Endpoint `http://localhost:11434`, model `llama3`.
 3. **Anthropic**: pick "Anthropic API with my own key" and paste your key. The key lives in your browser profile only. Usage bills your key.
 4. **Team proxy**: the owner deploys `proxy/` once (5 minutes, free), then shares a URL and passcode. Pick "Team proxy with a passcode" and enter both. Nobody but the owner ever sees the key.
+
+## Terms and AI disclaimer
+
+- The documents are [src/legal/terms.md](src/legal/terms.md) and [src/legal/ai-disclaimer.md](src/legal/ai-disclaimer.md). They were written by the student maintainers in plain language and have **not been reviewed by a lawyer**.
+- **In the extension**: the first time someone opens Chat they must click "I agree" before they can send a message. A line under the message box always says AI can make mistakes and links to both documents. Settings has a "Terms and AI disclaimer" card, second from the top.
+- **Changing the terms**: edit `src/legal/terms.md`, update its "Last updated" date, and set `TERMS_VERSION` in `src/shared/messages.js` to the same date. Every user is then asked to agree again. `npm run check` fails if the two dates differ.
+- **Open questions for an adult to settle**: the repository has no LICENSE file, the school has not approved use of its name and logo, and the terms name no governing law.
 
 ## Tools tab
 

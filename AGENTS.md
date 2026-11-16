@@ -27,6 +27,7 @@ You are working on **Spartan AI**, a **Google Chrome extension using Manifest V3
 | Schedule logic | `src/tools/schedule.js` (pure functions; keep UI out). The UI calls `scheduleSnapshot()` |
 | Rendering AI replies | `src/sidepanel/markdown.js`. Builds DOM nodes only |
 | Update check | `src/update/check.js` |
+| Terms of Use, AI Disclaimer | `src/legal/terms.md`, `src/legal/ai-disclaimer.md`, shown by `src/legal/legal.html`. If you change the terms, set `TERMS_VERSION` in `src/shared/messages.js` to the new "Last updated" date. Never weaken or remove the agreement screen, the disclaimer line, or the "not an official school product" statements without the maintainers asking |
 | Open work list | `docs/ROADMAP.md` |
 
 ## Rules
