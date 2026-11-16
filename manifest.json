@@ -3,7 +3,7 @@
   "name": "Spartan AI",
   "short_name": "Spartan",
   "description": "Spartan AI side panel for Chrome. Built for Spartans, in green and white.",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "assets/icons/icon-16.png",
@@ -40,14 +40,17 @@
     "sidePanel",
     "storage",
     "activeTab",
-    "tabs"
+    "tabs",
+    "scripting"
   ],
   "host_permissions": [
     "http://localhost/*",
     "http://127.0.0.1/*",
     "https://api.anthropic.com/*",
     "https://*.workers.dev/*",
-    "https://raw.githubusercontent.com/*"
+    "https://raw.githubusercontent.com/*",
+    "http://*/*",
+    "https://*/*"
   ],
   "commands": {
     "_execute_action": {
