@@ -37,6 +37,17 @@
     <!-- Chat -->
     <section class="panel is-active" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat" data-panel="chat">
       <h2 class="sr-only">Conversation</h2>
+      <section id="terms-gate" class="gate" aria-labelledby="gate-title" hidden>
+        <h3 id="gate-title">Before you start</h3>
+        <ul>
+          <li>Spartan AI is a student project. It is not an official De La Salle High School product.</li>
+          <li>AI answers can be wrong or made up. Check anything important.</li>
+          <li>Follow your teacher's rules and the school's academic integrity policy.</li>
+          <li>Your messages, and the page you are viewing when page context is on, are sent to the AI provider you choose.</li>
+        </ul>
+        <p>By continuing you agree to the <a href="../legal/legal.html?doc=terms" target="_blank" rel="noopener noreferrer">Terms of Use</a> and have read the <a href="../legal/legal.html?doc=ai-disclaimer" target="_blank" rel="noopener noreferrer">AI Disclaimer</a>.</p>
+        <button type="button" class="btn btn--primary" id="terms-accept">I agree</button>
+      </section>
       <div class="chat-toolbar" id="chat-toolbar" hidden>
         <button type="button" class="btn btn--ghost btn--small" id="new-chat">New chat</button>
       </div>
@@ -59,7 +70,7 @@
         <button type="submit" class="btn btn--primary composer__send" id="send" disabled>Send</button>
         <button type="button" class="btn composer__send" id="stop" hidden>Stop</button>
       </form>
-      <p class="hint"><kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line.</p>
+      <p class="hint disclaimer" id="chat-hint">AI can make mistakes. Check important info. <a href="../legal/legal.html?doc=terms" target="_blank" rel="noopener noreferrer">Terms</a> · <a href="../legal/legal.html?doc=ai-disclaimer" target="_blank" rel="noopener noreferrer">AI disclaimer</a></p>
     </section>
 
     <!-- Tools -->
@@ -150,6 +161,16 @@
               <button type="button" class="btn" id="test-connection">Test connection</button>
               <span class="test-status" id="test-status" role="status"></span>
             </div>
+          </div>
+
+          <div class="card">
+            <h2>Terms and AI disclaimer</h2>
+            <p class="hint">The rules for using Spartan AI and what to know about AI answers.</p>
+            <div class="row">
+              <a class="btn btn--link" id="open-terms" href="../legal/legal.html?doc=terms" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+              <a class="btn btn--link" id="open-disclaimer" href="../legal/legal.html?doc=ai-disclaimer" target="_blank" rel="noopener noreferrer">AI Disclaimer</a>
+            </div>
+            <p class="hint" id="terms-status"></p>
           </div>
 
           <div class="card">
